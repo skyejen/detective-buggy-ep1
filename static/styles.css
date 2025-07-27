@@ -57,7 +57,7 @@ a.my-btn:visited {
 
 /* Hyperlinks */
 
-.theme-dark a {
+.navbar {
   color: #ffcc00;
   text-align: center;
 }
