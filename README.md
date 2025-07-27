@@ -33,7 +33,6 @@ Deployment instructions or render.yaml will be added in a future update.
 ## 🛠️ Potential Improvements
 A list of potential improvements for future versions:
 
-- 🚀 Improve image loading speed by converting to WebP and/or lazy-loading static assets, or using CDN
 - ✅ Replace some hardcoded logic with dynamic, database-driven content
 - 🧠 Migrate from SQLite to Postgres for data persistence across deploys
 - 🗃️ Consider managed DBs like Supabase or Railway
