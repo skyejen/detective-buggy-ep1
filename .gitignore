@@ -2,4 +2,5 @@
 venv/
 .flaskenv
 todos.txt
-braindump.txt.DS_Store
+braindump.txt
+.DS_Store
