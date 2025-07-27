@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>🗃️ The Archives 🗃️</h2>
+
+<hr>
+
+<div class="static-frame">
+  <div class="static-frame-entry center-static">
+
+    <p>
+        The scent of old paper and fresh tea welcomes you. DS Theo looks up from a file, smiling gently.
+        <br><em>"Tough case?"</em> he asks. <em>"Come, sign the logs. I will make you a cuppa."</em>
+    </p>
+
+    <img src="{{ url_for('static', filename='img/scenes/archives-theo.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Archives">
+
+    <div class="investigation-info">
+
+        <p>Investigation completed in: {{ duration_minutes }} minute(s).</p>
+
+        {% if not logs_signed %}
+            <p>Thanks for playing! If you'd like to sign your name in the station logs, enter it below:</p>
+
+            <div class="station-cta-row">
+                <form method="post" action="{{ url_for('submit_name') }}">
+                    <input type="text" name="player_name" placeholder="Enter your name" id="player_name" maxlength="100" autocomplete="off">
+                    <button type="submit" class="my-btn">✍️ Sign station logs</button>
+                </form>
+            </div>
+
+        {% else %}
+            <p>🖋 Logs signed as <strong>{{ player_name }}</strong>.</p>
+        {% endif %}
+
+    </div>
+
+    <hr>
+
+    <div class="station-footer-cta">
+        <form action="{{ url_for('index') }}" method="POST">
+            <button type="submit" class="my-btn restart">🔄 Play Again</button>
+        </form>
+    </div>
+
+
+  </div>
+</div>
+
+{% endblock %}

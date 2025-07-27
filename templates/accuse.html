@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>⚖️ Accusation Room ⚖️</h2>
+
+    <div class="static-navbar">
+        <a href="/evidence-board">Evidence Board</a>
+    </div>
+
+    <hr>
+
+    {% if not_ready %}
+
+    <div class="static-frame">
+      <div class="static-frame-entry">
+
+        <p>❗️ You can’t accuse anyone yet. You need more evidence before making such a serious claim!</p>
+
+      </div>
+    </div>
+
+    {% else %}
+
+    <div class="container-sm my-5 p-4 rounded bg-dark text-white shadow suspect-section center-static">
+
+      <p>Who do you believe is guilty? Choose wisely...</p>
+
+        <div class="suspect-row">
+            {% for suspect in suspects %}
+            <div class="suspect-card-wrapper">
+                <div class="card bg-dark text-white shadow suspect-card h-100">
+                    <img src="{{ url_for('static', filename='img/suspects/' ~ suspect.image_filename) }}"
+                        class="card-img-top suspect-photo-lg"
+                        alt="{{ suspect.name }}">
+
+                    <div class="card-body">
+                      
+                      <div class="accusation-page-buttons">
+                        <form method="POST">
+                            <button name="accused" value="{{ suspect.name }}" class="my-btn">{{ suspect.name }}</button>
+                        </form>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% endif %}
+
+<script>
+  // Prevent browser from remembering the POST form submission
+  if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+  }
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>📘 Interview Logbook 📘</h2>
+<div class="static-navbar">
+  <a href="/evidence-board">Evidence Board</a> | <a href="/suspects">Suspect Board</a>
+</div>
+
+<hr>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+<div class="interview-entry">
+
+  <p>Select a suspect to begin your questioning or review their statements.</p>
+
+  {% for suspect in suspects %}
+  <div class="interview-suspect-entry">
+    <p class="interview-note">
+      <strong>{{ suspect['name'] }}</strong> —
+      <!-- Statuses -->
+      <em>
+        {% if suspect['disabled'] %}
+            🚫 {{ suspect['status'] }}
+        {% elif suspect['status'] == 'Not started' %}
+            🕰️ Not started
+        {% elif suspect['status'] == 'In progress' %}
+            📝 In progress
+        {% else %}
+            ✅ Complete
+        {% endif %}
+      </em><br>
+
+      <div class="interview-button-wrapper">
+      {% if suspect['disabled'] %}
+        <button type="button" disabled class="journal-btn journal-btn-disabled">
+          {{ suspect['status_message'] }}
+        </button>
+      {% else %}
+        <form method="GET" action="{{ url_for('interview_suspect', suspect_id=suspect['id']) }}">
+          <button type="submit" class="journal-btn lobby-btn">
+            {% if suspect['status'] == 'Not started' %}
+              Interview
+            {% elif suspect['status'] == 'In progress' %}
+              Continue Interview
+            {% else %}
+              View Interview Log
+            {% endif %}
+          </button>
+        </form>
+      {% endif %}
+      </div>
+  </div>
+  {% endfor %}
+
+{% endblock %}

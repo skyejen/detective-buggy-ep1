@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h2>🚨 Precinct Briefing 🚨</h2>
+
+    <hr>
+
+    <div class="static-frame">
+        
+        <div class="static-frame-entry center-static">
+
+            <p>
+                Officers, thank you for assembling on short notice.
+            </p>
+
+            <img src="{{ url_for('static', filename='img/scenes/briefing.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Briefing Scene">
+
+            <p class="image-bottom-line">
+                This morning, a troubling event was reported in our own station:
+                <br>the secure chicken treat stash has been emptied. 
+                <br>No signs of forced entry. No witnesses. Just a trail of crumbs and confusion.
+                <br>The suspect is one of us.
+            </p>
+
+            <a href="/how-to" class="my-btn image-bottom-line">Begin Investigation</a>
+
+        </div>
+    </div>
+
+{% endblock %}

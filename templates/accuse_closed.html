@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>🔒 Accusation Closed! 🔒</h2>
+
+    <hr>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+<div class="static-frame">
+  <div class="static-frame-entry center-static">
+
+    <p>Crawl your way back to the Verdict screen...</p>
+
+     <div class="back-to-verdict-btn">
+        <form action="{{ url_for('verdict') }}" method="GET">
+            <button type="submit" class="my-btn">⚖️ Back to Verdict</button>
+        </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Currently doesn't replace the whole history but helps with redirection
+  // Step 1: Replace current history entry with this page
+  history.replaceState(null, '', location.href);
+
+  // Step 2: Push a dummy state on top
+  history.pushState(null, '', location.href);
+
+  // Step 3: On back button, instantly redirect back here
+  window.addEventListener('popstate', function () {
+    location.replace('{{ url_for("accuse_closed") }}');
+  });
+</script>
+
+
+
+
+{% endblock %}

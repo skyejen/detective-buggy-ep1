@@ -1,0 +1,142 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>🧠 Evidence Board 🧠</h2>
+
+<div class="static-navbar-evidence-board">
+
+    <a href="/crime-scene"
+    {% if final_lock %}style="pointer-events: none; opacity: 0.5; text-decoration: none; color: grey;"{% endif %}>
+    Crime Scene
+    </a> |
+    <a href="/suspects">
+    Suspect Board
+    </a> |
+    <a href="/interview-lobby"
+    {% if final_lock %}style="pointer-events: none; opacity: 0.5; text-decoration: none; color: grey;"{% endif %}>
+    Interview Lobby
+    </a>
+
+</div>
+
+<hr>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="evidence-board-wrapper">
+
+    <div class="sticky-notes-left">
+        {% for note in notes %}
+        <div class="sticky-note">
+            {{ note.description }}
+        </div>
+        {% endfor %}   
+    </div>
+
+    <div class="evidence-board">
+
+    <h3>🧩 Clues</h3>
+    <ul>
+        {% if clues %}
+            {% for clue in clues %}
+            <li class="evidence-board-entry clue-entry">
+                <div class="evidence-entry-flex">
+                    
+                    {% if clue.name == 'Furball' %}
+                    <div class="evidence-thumbnail">
+                        <img src="{{ url_for('static', filename='img/evidence/crime-scene/furball.png') }}" alt="Furball">
+                    </div>
+                    {% elif clue.name == 'Bird Footprints' %}
+                    <div class="evidence-thumbnail">
+                        <img src="{{ url_for('static', filename='img/evidence/crime-scene/birdprints.png') }}" alt="Bird Footprints">
+                    </div>
+                    {% elif clue.name == 'Rusty Stain' %}
+                    <div class="evidence-thumbnail">
+                        <img src="{{ url_for('static', filename='img/evidence/security-closet/stain.png') }}" alt="Rusty Stain">
+                    </div>
+                    {% elif clue.name == 'Stilts With Bird Feet' %}
+                    <div class="evidence-thumbnail">
+                        <img src="{{ url_for('static', filename='img/evidence/security-closet/stilts.png') }}" alt="Stilts with Bird Feet">
+                    </div>
+                    {% elif clue.name == 'CCTV Footage' %}
+                    <div class="evidence-thumbnail">
+                        <img src="{{ url_for('static', filename='img/evidence/interviews/cctv-footage.png') }}" alt="CCTV Footage">
+                    </div>
+    
+                    {% endif %}
+
+                <div class="evidence-main">
+                    <strong>{{ clue.name }}</strong>: {{ clue.description }}
+                    {% if clue.origin %}
+                        <div class="evidence-origin">
+                            <small><em>Origin: {{ clue.origin }}</em></small>
+                        </div>
+                    {% endif %}
+                </div>
+
+                </div>
+            </li>
+            {% endfor %}
+        {% else %}
+            <li class="no-clues"><em>You haven’t discovered any evidence here yet. Get sniffin’!</em></li>
+        {% endif %}
+    </ul>
+
+    <h3>📄 Records</h3>
+    <ul>
+        {% for record in records %}
+        <li class="evidence-board-entry record-entry">
+            <div class="evidence-entry-flex">
+                    <div class="evidence-main">
+                        <strong>{{ record.name }}</strong>: {{ record.description }}
+                        {% if record.origin %}
+                        <div class="evidence-origin">
+                            <small><em>Origin: {{ record.origin }}</em></small>
+                        </div>
+                        {% endif %}
+                    </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    </div>
+
+    <div class="sticky-notes-right">
+        {% if 6 in session['unlocked_evidence'] %} <!-- CCTV Footage // hardcoded due to scope creep/time sync, may change later -->
+                <div class="new-location-note">
+                    <a href="/security-room"
+                        {% if final_lock %}style="pointer-events: none; opacity: 0.5; text-decoration: none; color: grey;"{% endif %}>
+                        New Location Unlocked:<br> <strong>🔒 Security Room</strong>
+                    </a>
+                </div>
+        {% endif %}
+
+        {% if 12 in session['unlocked_evidence'] %} <!-- Locker Room Access // hardcoded due to scope creep/time sync, may change later -->
+                <div class="new-location-note">
+                    <a href="/locker-room"
+                        {% if final_lock %}style="pointer-events: none; opacity: 0.5; text-decoration: none; color: grey;"{% endif %}>
+                        New Location Unlocked:<br> <strong>🔑 Locker Room</strong>
+                    </a>
+                </div>
+        {% endif %} 
+
+        {% if final_lock %}
+
+                <div class="new-location-note">
+                    <a href="/accuse">
+                        <strong>🚨 Proceed to Final&nbsp;Accusation</strong>
+                    </a>
+                </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

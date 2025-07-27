@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>🔒 Security Room 🔒</h2>
+
+    <div class="static-navbar">
+        <a href="/evidence-board">Evidence Board</a>
+    </div>
+
+    <hr>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+<div class="static-frame">
+  <div class="static-frame-entry center-static">
+
+    {% if session.get("steven_denial_shown") %}
+
+      <!-- First time accusation (CCTV + bird prints) -->
+      {% if session.get("accusation_origin") == "security" and not session.get("first_popup_shown") %}
+
+      <div id="scene-content">
+        <p>The footage is corrupted. Something’s not right.</p>
+
+        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Security Room">
+
+        <p class="image-bottom-line">🗣️ You hear PC Steven say: <em>“I swear I didn’t do anything to the tape. It wasn’t me!”</em></p>
+        <p>💭 DI Buggy is thinking: <em>"Birdlike prints at the crime scene... and now the footage is corrupted?<br>Could PC Steven have done this?"</em></p>
+
+        <!-- FIRST STATE -->
+        <div id="popup-initial">
+          <button id="popup-continue-btn" class="my-btn">🕵️ Continue</button>
+        </div>
+      </div>
+
+        <!-- SECOND STATE (Initially Hidden) -->
+        <div id="popup-accusation" style="display: none;">
+          <div class="accusation-text">
+
+            <h3>🕵️ Make an Accusation?</h2>
+            <p><strong>🕵️ At this point in the story, you may have enough information to make an accusation.</strong><br>How would you like to proceed?</p>
+
+          </div>
+          
+          <div class="accusation-page-buttons">
+            <form method="POST" action="{{ url_for('accuse') }}">
+                <input type="hidden" name="popup_dismissed" value="1">
+                <button name="choice" value="accuse" class="my-btn">Make an Accusation</button>
+            </form>
+
+            <form method="POST" action="{{ url_for('security_room') }}">
+                <input type="hidden" name="popup_dismissed" value="1">
+                <button name="choice" value="security-room" class="my-btn">Keep Investigating</button>
+            </form>
+
+            <form method="POST" action="{{ url_for('security_room') }}">
+                <input type="hidden" name="popup_dismissed" value="1">
+                <button name="choice" value="evidence-board" class="my-btn">Review Evidence</button>
+            </form>
+          </div>
+        </div>
+  </div>
+</div>
+
+      <!-- Return visit AFTER declining accusation OR just returning later, ready to hear Banana -->
+      {% elif session.get("heard_banana") and not found_banana %}
+        <p>You hear a faint sobbing coming from the supply closet nearby...</p>
+
+        <img src="{{ url_for('static', filename='img/scenes/security-closet-door.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Security Closet Door">
+
+        <form action="{{ url_for('security_closet') }}" method="get">
+          <button type="submit" class="my-btn">Investigate the Closet</button>
+        </form>
+
+
+      <!-- Return visit AFTER Banana sequence (full closure) -->
+      {% elif found_banana %}
+        <p>Upon inspection, the CCTV footage was confirmed to be corrupted and logged in the Evidence Board.</p>
+        <p>PC Steven has denied his involvement, even though another suspicious piece of evidence was found at the crime scene (the bird prints).</p>
+        <p>Shortly after, DI Buggy heard faint sobbing coming from the nearby supply closet, where traumatised PC Banana was discovered. They are unable to speak.</p>
+        
+        <form action="{{ url_for('security_closet') }}" method="get">
+          <button type="submit" class="my-btn">Revisit the Closet</button>
+        </form>
+
+      <!-- First time CCTV play WITHOUT bird prints -->
+      {% elif session.get("just_played_cctv") %}
+
+        <p>The footage is corrupted. Something’s not right.</p>
+
+        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Security Room">
+
+        <p class="image-bottom-line">🗣️ You hear PC Steven say: <em>“I swear I didn’t do anything to the tape. It wasn’t me!”</em></p>
+        {% set _ = session.__setitem__('just_played_cctv', False) %}
+
+      <!-- Default revisit after footage and denial, but nothing else -->
+      {% else %}
+
+        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Security Room">
+
+        <p class="image-bottom-line">Upon inspection, the CCTV footage was confirmed to be corrupted and logged in the Evidence Board.</p>
+        <p>PC Steven has denied any involvement.</p>
+      {% endif %}
+
+    {% elif not unlocked %}
+      <p>You shouldn't be here yet. DI Buggy doesn’t have a reason to check this room.</p>
+
+    {% elif not corrupted_unlocked %}
+
+      <p>You find the security terminal. Time to play the CCTV footage from the time of the incident.</p>
+
+
+      <img src="{{ url_for('static', filename='img/scenes/security-room.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Security Room">
+
+      <form method="POST">
+        <button type="submit" class="my-btn">📼 Play Footage</button>
+      </form>
+
+    {% elif seen_room and not session.get("steven_denial_shown") %}
+      <!-- Edge case/fallback: corrupted footage present but Steven’s denial not flagged -->
+
+      <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="The Security Room">
+
+      <p class="image-bottom-line">The footage is corrupted. Something’s not right.</p>
+
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+
+

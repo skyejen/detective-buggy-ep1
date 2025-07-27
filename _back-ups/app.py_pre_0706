@@ -1,0 +1,171 @@
+from flask import Flask, render_template, request, redirect, session, flash
+from flask_session import Session
+
+import sqlite3
+
+# Open connection with raw SQL
+def get_db_connection():
+    conn = sqlite3.connect("data.db")
+    conn.row_factory = sqlite3.Row  # this addition allows column access by name
+    return conn
+
+app = Flask(__name__)
+app.secret_key = "super-secret-buggy-code"
+
+# Configure session
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+
+# Landing / Title Screen
+@app.route("/")
+def index():
+    session.clear() # Starts a fresh game (default for MVP)
+    return render_template("index.html")
+
+
+# How-To / Tutorial
+@app.route("/intro")
+def intro():
+    return render_template("intro.html")
+
+
+# Briefing at the station (story) + mini-instructions to the player
+@app.route("/briefing")
+def briefing():
+    return render_template("briefing.html")
+
+
+# Crime-scene is more like a lab where you review evidence (not really "look" for it)
+@app.route("/crime-scene", methods=["GET", "POST"])
+def crime_scene():
+    if request.method == "POST":
+        clue_name = request.form["object"]
+
+        with get_db_connection() as conn:
+            row = conn.execute("SELECT id FROM clues WHERE LOWER(name) = LOWER(?)", (clue_name,)).fetchone()
+
+        if not row:
+            flash("❗️Unknown clue.")
+            return redirect("/crime-scene")
+
+        clue_id = row["id"]
+
+        clues = session.get("unlocked_clues", [])
+        if clue_id not in clues:
+            clues.append(clue_id)
+            flash("🧠 New clue added!")
+        else:
+            flash("📌 You’ve already discovered that clue.")
+
+        session["unlocked_clues"] = clues
+        return redirect("/crime-scene")
+
+    return render_template("crime-scene.html")
+
+
+# List/board of Suspects
+@app.route("/suspects")
+def show_suspects():
+    with get_db_connection() as conn:
+        suspects = conn.execute("SELECT * FROM suspects").fetchall()
+    return render_template("suspects.html", suspects=suspects)
+
+
+# The Evidence Board (all unlocked evidence so far)
+@app.route("/clues")
+def show_clues():
+    with get_db_connection() as conn:
+        all_clues = conn.execute("SELECT * FROM clues").fetchall()
+
+    # Only show unlocked clues
+    unlocked = session.get("unlocked_clues", [])
+    visible_clues = [clue for clue in all_clues if clue["id"] in unlocked]
+
+    print("SESSION:", session.get("unlocked_clues"))
+
+    return render_template("clues.html", clues=visible_clues)
+
+
+# The Interview Screen (players can select whom to interview)
+@app.route("/interview", methods=["GET", "POST"])
+def interview():
+    with get_db_connection() as conn:
+        suspects = conn.execute("SELECT * FROM suspects").fetchall()
+
+    if request.method == "POST":
+        suspect_id = request.form.get("suspect_id")
+        return redirect(f"/interview/{suspect_id}")
+
+    # Fetch already interviewed suspects from session
+    interviewed = session.get("interviewed_suspects", [])
+
+    return render_template("interview.html", suspects=suspects, interviewed=interviewed)
+
+
+# The Interview Room (the actual dialogue with the potential suspect)
+@app.route("/interview/<int:suspect_id>")
+def interview_suspect(suspect_id):
+    with get_db_connection() as conn:
+        suspect = conn.execute("SELECT * FROM suspects WHERE id = ?", (suspect_id,)).fetchone()
+        dialogue_lines = conn.execute("SELECT * FROM dialogues WHERE suspect_id = ?", (suspect_id,)).fetchall()
+
+    # Pre-fetch clues for fast access
+    clues_lookup = conn.execute("SELECT id, name FROM clues").fetchall()
+    clue_map = {row["id"]: row["name"] for row in clues_lookup}
+
+    if not suspect:
+        return "Suspect not found", 404
+
+    # Initialise session storage for interviewed_suspects
+    if "interviewed_suspects" not in session:
+        session["interviewed_suspects"] = []
+
+    # Store suspect ID if not already tracked
+    if suspect_id not in session["interviewed_suspects"]:
+        session["interviewed_suspects"].append(suspect_id)
+
+    # Initialise session storage for unlocked_clues
+    if "unlocked_clues" not in session:
+        session["unlocked_clues"] = []
+
+    # Unlock any clues tied to this suspect's dialogue lines
+    for line in dialogue_lines:
+        print("LINE:", line)
+        print("KEYS:", line.keys())
+
+        clue_id = line["clue_unlocked_id"]
+        if clue_id and clue_id not in session["unlocked_clues"]:
+            session["unlocked_clues"].append(clue_id)
+            clue_name = clue_map.get(clue_id, "Unknown Clue")
+            flash(f"🧩 New clue discovered: {clue_name}")
+
+    # print(session)
+    return render_template("interview-suspect.html", suspect=suspect, dialogue_lines=dialogue_lines)
+
+
+# Reporting Screen (the player will attempt to accuse one of the suspects to win the game)
+@app.route("/report", methods=["GET", "POST"])
+def report():
+    return render_template("report.html")
+
+
+# The Verdict Screen (the end game screen either winning if accusation is correct, or losing if not)
+@app.route("/verdict")
+def verdict():
+    return render_template("verdict.html")
+
+
+# Easter Egg is a screen where you can talk to Professor Ball for clues
+@app.route("/easteregg")
+def easteregg():
+    return render_template("easteregg.html")
+
+
+# Debug (dev only)
+@app.route("/reset-session")
+def reset_session():
+    session.clear()
+    return "Session cleared! Go back to <a href='/'>home</a>."
+

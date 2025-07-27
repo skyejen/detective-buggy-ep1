@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h2>🩸 The Crime Scene 🩸</h2>
+
+    <div class="static-navbar">
+        <a href="/evidence-board">Evidence Board</a>
+    </div>
+
+    <hr>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+
+    {% if session.get("crime_scene_popup_ready") and not session.get("first_popup_shown") %}
+    <div id="popup-area" class="static-frame">
+        <div class="static-frame-entry">
+
+        <!-- Buggy's Initial Thoughts -->
+        <div id="popup-initial">
+            <p>💭 DI Buggy is thinking: <em>"Corrupted footage... and now birdlike prints at the crime scene?<br>Could PC Steven have done this?"</em></p>
+            <button id="popup-continue-btn" class="my-btn">🕵️ Continue</button>
+        </div>
+
+        <!-- Accusation Options -->
+        <div id="popup-accusation" style="display: none;">
+            <h2>🕵️ Make an Accusation?</h2>
+                <p><strong>🕵️ At this point in the story, you may have enough information to make an accusation.</strong><br>How would you like to proceed?</p>
+
+            <div class="modal-button-row">
+                <form method="POST" action="{{ url_for('accuse') }}">
+                    <input type="hidden" name="popup_dismissed" value="1">
+                    <button name="choice" value="accuse" class="my-btn">Make an Accusation</button>
+                </form>
+
+                <form method="POST" action="{{ url_for('crime_scene') }}">
+                    <input type="hidden" name="popup_dismissed" value="1">
+                    <button name="choice" value="crime-scene" class="my-btn">Keep Investigating</button>
+                </form>
+
+                <form method="POST" action="{{ url_for('evidence_board') }}">
+                    <input type="hidden" name="popup_dismissed" value="1">
+                    <button name="choice" value="evidence-board" class="my-btn">Review Evidence</button>
+                </form>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    {% endif %}
+
+    {% set unlocked_flavour = session.get('unlocked_flavour', []) %}
+    
+    <div class="container-sm p-4 rounded bg-dark text-white shadow evidence-section center-static">
+        
+        <p>Inspect the Crime Scene to find evidence. All discovered evidence will be logged on the Evidence Board.</p>
+
+        <div class="evidence-row">
+            {% for item in evidence %}
+            <div class="evidence-card-wrapper">
+                <div class="card bg-dark text-white shadow evidence-card h-100">
+                   
+                    {% if item.name == "Furball" %}
+                        <img src="/static/img/evidence/crime-scene/furball.png" alt="Furball" class="card-img-top evidence-photo">
+                    {% elif item.name == "Bird Footprints" %}
+                        <img src="/static/img/evidence/crime-scene/birdprints.png" alt="Bird Footprints" class="card-img-top evidence-photo">
+                    {% elif item.name == "Mystery Moth" %}
+                        <img src="/static/img/evidence/crime-scene/moth.png" alt="Bird Footprints" class="card-img-top evidence-photo">
+                    {% elif item.name == "Chewed-Up Report" %}
+                        <img src="/static/img/evidence/crime-scene/police-report.png" alt="Bird Footprints" class="card-img-top evidence-photo">
+                    {% elif item.name == "Lost Tennis Ball" %}
+                        <img src="/static/img/evidence/crime-scene/tennis-ball.png" alt="Bird Footprints" class="card-img-top evidence-photo">
+                    {% else %}
+                        <img src="/static/img/evidence/crime-scene/default.png" alt="Unknown Evidence">
+                    {% endif %}
+
+
+                    <div class="card-body text-center">
+                        <form method="POST">
+                            <input type="hidden" name="object" value="{{ item.id }}">
+                            {% if item.id in session['unlocked_evidence'] or item.id in unlocked_flavour %}
+                                <button type="submit" disabled class="btn">🔓 {{ item.name }}</button>
+                            {% else %}
+                                <button type="submit" class="my-btn">{{ item.label }}</button>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
+
+

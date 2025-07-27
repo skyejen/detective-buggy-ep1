@@ -1,0 +1,534 @@
+from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask_session import Session
+
+import sqlite3
+
+# Open connection with raw SQL
+def get_db_connection():
+    conn = sqlite3.connect("data.db")
+    conn.row_factory = sqlite3.Row  # this addition allows column access by name
+    return conn
+
+app = Flask(__name__)
+app.secret_key = "super-secret-buggy-code"
+
+# Configure session
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+
+# Landing / Title Screen
+@app.route("/")
+def index():
+    session.clear() # Starts a fresh game (default for MVP)
+    return render_template("index.html")
+
+
+# Briefing at the station (story)
+@app.route("/briefing")
+def briefing():
+    return render_template("briefing.html")
+
+
+# How-To / Tutorial
+@app.route("/how-to")
+def how_to():
+    return render_template("how-to.html")
+
+
+# Crime-scene is more like a lab where you review evidence (not really "look" for it)
+@app.route("/crime-scene", methods=["GET", "POST"])
+def crime_scene():
+    # 1. Track visits
+    session["crime_scene_visits"] = session.get("crime_scene_visits", 0) + 1
+
+    # 2. Get current dialogue progress
+    progress = session.get("dialogue_progress", {})
+
+    # 3. Get Professor Ball's evidence ID
+    with get_db_connection() as conn:
+        ball_row = conn.execute(
+            "SELECT id FROM evidence WHERE name = ?", ("Professor Ball's Comment",)
+        ).fetchone()
+        ball_id = ball_row["id"] if ball_row else None
+
+    # 4. Fetch all evidence in the crime scene
+    with get_db_connection() as conn:
+        crime_scene_evidence = conn.execute(
+            "SELECT id, name, label FROM evidence WHERE LOWER(location) = 'crime scene'"
+        ).fetchall()
+
+    # 5. Filter Ball unless he should be visible
+    if not (
+        session["crime_scene_visits"] > 1 and len(progress) >= 4
+    ):
+        # Filter out Ball if not unlocked yet
+        crime_scene_evidence = [
+            item for item in crime_scene_evidence if item["id"] != ball_id
+        ]
+    else:
+        # If Ball wasn't previously shown, flash now
+        if ball_id and ball_id not in session.get("unlocked_evidence", []):
+            flash("👀 You notice Professor Ball meditating quietly in the corner...")
+
+    # 6. Handle inspection clicks
+    if request.method == "POST":
+        evidence_name = request.form["object"]
+        matching = next(
+            (item for item in crime_scene_evidence if item["name"].lower() == evidence_name.lower()),
+            None
+        )
+
+        if not matching:
+            flash("❗️Unknown evidence.")
+            return redirect("/crime-scene")
+
+        evidence_id = matching["id"]
+        unlocked = session.get("unlocked_evidence", [])
+
+        if evidence_id not in unlocked:
+            unlocked.append(evidence_id)
+            flash(f"🧩 New evidence discovered: {evidence_name}.")
+        else:
+            flash("📌 You’ve already discovered that evidence.")
+
+        session["unlocked_evidence"] = unlocked
+        return redirect("/crime-scene")
+
+    # 7. 🎯 NEW: Offer accusation from Crime Scene if conditions are met
+    unlocked = session.get("unlocked_evidence", [])
+    birdprints_id = 5
+    corrupted_id = 14
+
+    if (
+        birdprints_id in unlocked
+        and corrupted_id in unlocked
+        and not session.get("first_accusation_offered")
+    ):
+        session["first_accusation_offered"] = True
+        session["accusation_stage"] = 1
+        session["accusation_origin"] = "crime_scene"
+        session["crime_scene_popup_ready"] = True
+        session.modified = True
+
+    return render_template("crime-scene.html", evidence=crime_scene_evidence)
+
+
+# List/board of Suspects
+@app.route("/suspects")
+def show_suspects():
+    with get_db_connection() as conn:
+        suspects = conn.execute("SELECT * FROM suspects").fetchall()
+
+    progress = session.get("dialogue_progress", {})
+
+    enhanced_suspects = []
+    for suspect in suspects:
+        suspect_dict = dict(suspect)
+        suspect_id = str(suspect["id"])
+
+        if suspect["name"] == "DC Banana":
+            suspect_dict["alibi_visible"] = True  # Always show for Banana
+        else:
+            suspect_dict["alibi_visible"] = suspect_id in progress and progress[suspect_id] > 0
+
+        enhanced_suspects.append(suspect_dict)
+
+    return render_template("suspects.html", suspects=enhanced_suspects)
+
+
+
+# The Evidence Board (all unlocked evidence so far)
+@app.route("/evidence-board")
+def evidence_board():
+    with get_db_connection() as conn:
+        all_evidence = conn.execute("SELECT * FROM evidence").fetchall()
+
+    unlocked = session.get("unlocked_evidence", [])
+
+    # Include evidence that is either unlocked OR always visible
+    visible_evidence = [
+        ev for ev in all_evidence
+        if ev["id"] in unlocked or ev["always_visible"]
+    ]
+
+    # Group by category
+    clues = [ev for ev in visible_evidence if ev["category"] == "clue"]
+    records = [ev for ev in visible_evidence if ev["category"] == "record"]
+    notes = [ev for ev in visible_evidence if ev["category"] == "note"]
+
+    return render_template(
+        "evidence-board.html",
+        clues=clues,
+        records=records,
+        notes=notes,
+        evidence=visible_evidence  # still needed for your {% if evidence %}
+    )
+
+
+
+# The Interview Lobby / Holding Area (players can select whom to interview)
+@app.route("/interview-lobby", methods=["GET", "POST"])
+def interview_lobby():
+    # --- 1. Get suspects from the database ---
+    with get_db_connection() as conn:
+        suspects = conn.execute("SELECT * FROM suspects").fetchall()
+
+        # Dialogue counts per suspect (so we know when interviews are complete)
+        dialogue_counts = conn.execute("""
+            SELECT suspect_id, COUNT(*) as count
+            FROM dialogues
+            GROUP BY suspect_id
+        """).fetchall()
+
+    # --- 2. Turn dialogue_counts into a dictionary ({ suspect_id: count}) ---
+    # This helps us quickly look up how many lines each suspect has
+    dialogue_line_count = {}
+    for row in dialogue_counts:
+        suspect_id = row["suspect_id"]
+        number_of_lines = row["count"]
+        dialogue_line_count[suspect_id] = number_of_lines
+
+    # --- 3. Initialise session keys if missing ---
+    if "dialogue_progress" not in session:
+        session["dialogue_progress"] = {}
+
+    if "interviewed_suspects" not in session:
+        session["interviewed_suspects"] = []
+
+    # --- 4. Grab session data ---
+    progress = session["dialogue_progress"]
+    interviewed_suspects = session["interviewed_suspects"]
+
+    # --- 5. Attach a 'status' label to each suspect based on progress ---
+    mutable_suspects = [] # had to do it this way as was hitting 500 due to trying to change SQL row object
+
+    for row in suspects:
+        suspect = dict(row)  # Convert to a mutable dict
+
+        suspect_id = suspect["id"]
+        suspect_id_str = str(suspect_id)
+
+        total_lines = dialogue_line_count.get(suspect_id, 0)
+        current_index = progress.get(suspect_id_str, 0)
+
+        if current_index == 0:
+            suspect["status"] = "Not started"
+        elif current_index < total_lines:
+            suspect["status"] = "In progress"
+        else:
+            suspect["status"] = "Complete"
+
+        # Banana logic
+        if suspect["name"] == "DC Banana":
+            suspect["disabled"] = True
+            suspect["status"] = "Missing"
+            suspect["status_message"] = "Interview (Unavailable)"
+
+        mutable_suspects.append(suspect)
+
+    # --- 6. Sort by status priority, then alphabetically ---
+
+    # Define priority mapping
+    status_priority = {
+        "In progress": 1,
+        "Not started": 2,
+        "Complete": 3
+    }
+
+    # Helper to sort suspects
+    def sort_suspects(suspect):
+        status = suspect["status"]
+        name = suspect["name"]
+        return (status_priority.get(status, 99), name.lower())
+
+    # Apply sorting to your mutable list
+    mutable_suspects.sort(key=sort_suspects)
+
+    # --- 7. Show the lobby with all suspect statuses ---
+    return render_template(
+        "interview-lobby.html",
+        suspects=mutable_suspects,
+        interviewed=interviewed_suspects
+    )
+
+
+# The Interview Room (the actual dialogue with the potential suspect)
+@app.route("/interview-lobby/<int:suspect_id>", methods=["GET", "POST"])
+def interview_suspect(suspect_id):
+    with get_db_connection() as conn:
+        suspect = conn.execute("SELECT * FROM suspects WHERE id = ?", (suspect_id,)).fetchone()
+        dialogue_lines = conn.execute("SELECT * FROM dialogues WHERE suspect_id = ?", (suspect_id,)).fetchall()
+
+        # Pre-fetch evidence for fast access
+        evidence_lookup = conn.execute("SELECT id, name FROM evidence").fetchall()
+
+    if not suspect:
+        return "Suspect not found", 404
+
+    # Initialise session storage if missing
+    if "interviewed_suspects" not in session:
+        session["interviewed_suspects"] = []
+
+    if "unlocked_evidence" not in session:
+        session["unlocked_evidence"] = []
+
+    if "dialogue_progress" not in session:
+        session["dialogue_progress"] = {}
+
+    # For template rendering
+    show_log = False  # Default fallback to avoid UnboundLocalError
+
+    # Mark this suspect as interviewed
+    if suspect_id not in session["interviewed_suspects"]:
+        session["interviewed_suspects"].append(suspect_id)
+
+    # Get this suspect's current dialogue index
+    progress = session["dialogue_progress"]
+    current_index = progress.get(str(suspect_id), 0) # Remembering to convert to str cause it's stored in JSON which only allows strs
+
+    # Turn evidence_lookup values into a dictionary for easy access (for evidence_name below)
+    evidence_map = {}
+    for row in evidence_lookup:
+        evidence_id = row["id"]
+        evidence_name = row["name"]
+        evidence_map[evidence_id] = evidence_name
+
+    # Fetch the current dialogue line
+    current_line = None
+    if current_index < len(dialogue_lines):
+        current_line = dialogue_lines[current_index]
+
+        # Unlock evidence if linked
+        evidence_id = current_line["evidence_id"]
+        if evidence_id and evidence_id not in session["unlocked_evidence"]:
+            session["unlocked_evidence"].append(evidence_id)
+
+            # Fetch evidence name based on the dictionary created above (if doesn't exist, display "Unknown Evidence")
+            if evidence_id in evidence_map:
+                evidence_name = evidence_map[evidence_id]
+            else:
+                evidence_name = "Unknown Evidence"
+
+            flash(f"🧩 New evidence discovered: {evidence_name}")
+
+    # Advance dialogue on POST (MUST go first to avoid show_log error)
+    if request.method == "POST":
+        progress[str(suspect_id)] = current_index + 1 # Remembering to convert to str cause it's stored in JSON which only allows strs
+        session["interview_progress"] = progress
+        session.modified = True
+        return redirect(url_for("interview_suspect", suspect_id=suspect_id))
+
+    # Fetch the current line or prepare log
+    interview_complete = current_index >= len(dialogue_lines)
+
+    # Flag to show log instead of "Continue" (for the read-only interview logs)
+    if interview_complete:
+        current_line = None  # No active line left to show (So HTML won’t try to show another line)
+        show_log = True
+    else:
+        current_line = dialogue_lines[current_index]
+        show_log = False
+
+    return render_template(
+        "interview-suspect.html",
+        suspect=suspect,
+        current_line=current_line,
+        show_log=show_log, # Needed for log replay
+        dialogue_lines=dialogue_lines
+    )
+
+# Sec room
+@app.route("/security-room", methods=["GET", "POST"])
+def security_room():
+    # --- 1. Init Session Flags ---
+    session.setdefault("unlocked_evidence", [])
+    session.setdefault("seen_room", False)
+    session.setdefault("found_banana", False)
+    session.setdefault("first_accusation_offered", False)
+    session.setdefault("steven_denial_shown", False)
+    session.setdefault("accusation_origin", None)
+    session.setdefault("heard_banana", False)  # ✅ New guard for Banana trigger
+
+    # --- 2. Clue IDs ---
+    cctv_record_id = 6
+    corrupted_clue_id = 14
+    birdprints_id = 5
+
+    # --- 3. Unpack Key States ---
+    unlocked = cctv_record_id in session["unlocked_evidence"]
+    corrupted_unlocked = corrupted_clue_id in session["unlocked_evidence"]
+    birdprints_found = birdprints_id in session["unlocked_evidence"]
+    found_banana = session["found_banana"]
+
+    # --- 4. Mark first time visit ---
+    if not session["seen_room"]:
+        session["seen_room"] = True
+        session.modified = True
+
+    # --- 5. Player presses button to play CCTV ---
+    if request.method == "POST" and unlocked and not corrupted_unlocked:
+        session["unlocked_evidence"].append(corrupted_clue_id)
+        session["seen_security_room"] = True
+        session["steven_denial_shown"] = True
+        session["just_played_cctv"] = True  # Only for next GET
+
+        # Offer accusation if bird prints already found
+        if birdprints_found and not session["first_accusation_offered"]:
+            session["first_accusation_offered"] = True
+            session["accusation_stage"] = 1
+            session["accusation_origin"] = "security"
+
+        flash("🧩 New evidence discovered: Corrupted CCTV Footage.")
+        session.modified = True
+        return redirect(url_for("security_room"))
+
+    # --- 6. Post-footage revisit: trigger Banana sequence if ready
+    if (
+        session.get("seen_security_room")
+        and corrupted_unlocked
+        and birdprints_found
+        and not found_banana
+        and not session.get("heard_banana")
+    ):
+        session["heard_banana"] = True
+        session.modified = True
+
+    # --- 7. Render page ---
+    return render_template(
+        "security-room.html",
+        unlocked=unlocked,
+        corrupted_unlocked=corrupted_unlocked,
+        found_banana=found_banana,
+        birdprints_found=birdprints_found,
+    )
+
+
+
+
+
+@app.route("/security-closet", methods=["GET", "POST"])
+def security_closet():
+    # Initialise session memory
+    session.setdefault("closet_progress", 0)
+    session.setdefault("unlocked_evidence", [])
+    session.setdefault("found_banana", False)
+    session.setdefault("closet_looked_around", False)
+    session.setdefault("declined_accusation", False)
+
+    # 🧠 If player just declined the accusation, reset scene to play Banana
+    if session["declined_accusation"]:
+        session["closet_progress"] = 0
+        session["closet_looked_around"] = False
+        session["declined_accusation"] = False
+        session.modified = True
+
+    progress = session["closet_progress"]
+
+    # Scene lines
+    closet_lines = [
+        "You slowly open the supply closet...",
+        "Inside, you find DC Banana curled up, sobbing quietly. They flinch as you enter.",
+        "<em>This officer seems traumatised. They might need a moment…</em>"
+    ]
+
+    last_index = len(closet_lines) - 1
+    if progress > last_index:
+        progress = last_index
+
+    current_line = closet_lines[progress]
+    show_continue = progress < last_index
+    show_look_button = not show_continue and not session["closet_looked_around"]
+    show_clues = session["closet_looked_around"]
+
+    if request.method == "POST":
+        if "object" in request.form:
+            clue_name = request.form["object"]
+            conn = get_db_connection()
+            clue = conn.execute("SELECT id FROM evidence WHERE name = ?", (clue_name,)).fetchone()
+            conn.close()
+            if clue and clue["id"] not in session["unlocked_evidence"]:
+                session["unlocked_evidence"].append(clue["id"])
+                flash(f"🧩 New evidence discovered: {clue_name}.")
+                session.modified = True
+            return redirect(url_for("security_closet"))
+
+        elif "look" in request.form:
+            session["closet_looked_around"] = True
+            session.modified = True
+            return redirect(url_for("security_closet"))
+
+        else:
+            session["closet_progress"] += 1
+            progress = session["closet_progress"]
+            session.modified = True
+
+            # Unlock Banana clue at the right step
+            if progress == 1:
+                banana_record_id = 12
+                if banana_record_id not in session["unlocked_evidence"]:
+                    session["unlocked_evidence"].append(banana_record_id)
+                    session["found_banana"] = True
+                    flash(f"🧩 New evidence discovered: Sobbing Banana.")
+                    session.modified = True
+
+            return redirect(url_for("security_closet"))
+
+    evidence_clues = []
+    if show_clues:
+        conn = get_db_connection()
+        evidence_clues = conn.execute("""
+            SELECT id, name, label
+            FROM evidence
+            WHERE origin = ? AND category = 'clue'
+        """, ("Security Room Closet",)).fetchall()
+        conn.close()
+
+    return render_template("security-closet.html",
+        current_line=current_line,
+        show_continue=show_continue,
+        show_look_button=show_look_button,
+        show_clues=show_clues,
+        evidence_clues=evidence_clues
+    )
+
+
+
+# Reporting Screen (the player will attempt to accuse one of the suspects to win the game)
+@app.route("/accuse", methods=["GET", "POST"])
+def accuse():
+    if request.method == "POST":
+        choice = request.form.get("choice")
+        session["first_popup_shown"] = True
+        session.modified = True
+
+        if choice == "accuse":
+            return redirect(url_for("accusation_form"))  # <-- this is where you'll handle who they pick
+        elif choice == "interviews":
+            return redirect(url_for("interview_lobby"))
+        else:
+            return redirect(url_for("evidence_board"))
+
+    # If they GET /accuse directly, you could render the main accusation page here (if needed)
+    return render_template("accuse.html")
+
+
+# The Verdict Screen (the end game screen either winning if accusation is correct, or losing if not)
+@app.route("/verdict")
+def verdict():
+    return render_template("verdict.html")
+
+
+# Easter Egg is a screen where you can talk to Professor Ball for evidence
+@app.route("/easteregg")
+def easteregg():
+    return render_template("easteregg.html")
+
+
+# Debug (dev only)
+@app.route("/reset-session")
+def reset_session():
+    session.clear()
+    return "Session cleared! Go back to <a href='/'>home</a>."
+

@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>🔑 Locker Room 🔑</h2>
+
+<hr>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+<div class="static-frame">
+  <div class="static-frame-entry center-static">
+
+    <p>{{ current_line|safe }}</p>
+
+    {% if line_index == 0 or line_index == 3 %}
+
+    <img src="{{ url_for('static', filename='img/scenes/locker-room-spoony.png') }}"
+                                class="card-img-top suspect-photo-lg wide-img"
+                                alt="The Locker Room - Spoony">
+
+    {% elif line_index == 1 %}
+
+    <img src="{{ url_for('static', filename='img/scenes/locker-room-treats.png') }}"
+                                class="card-img-top suspect-photo-lg wide-img"
+                                alt="The Locker Room - Treats">
+
+
+    {% elif line_index == 2 %}
+
+    <img src="{{ url_for('static', filename='img/scenes/locker-room-fur.png') }}"
+                                class="card-img-top suspect-photo-lg wide-img"
+                                alt="The Locker Room - Fur">
+
+    {% endif %}
+
+    {% if show_continue %}
+      <form method="POST">
+        <button type="submit" class="my-btn">Continue</button>
+      </form>
+    {% endif %}
+
+    {% if session.get("final_lock") %}
+
+    <hr>
+    
+      <div class="popup-box-final">
+        <p><strong>🕵️ This is it. You’ve gathered all key evidence. Ready to make your accusation?</strong></p>
+
+        <div class="final-accusation-buttons">
+
+          <form method="POST" action="{{ url_for('accuse') }}">
+            <button name="choice" value="accuse" class="my-btn">Make an Accusation</button>
+          </form>
+
+          <form method="POST" action="{{ url_for('evidence_board') }}">
+            <button name="choice" value="evidence-board" class="my-btn">Review Evidence</button>
+          </form>
+
+        </div>
+
+      </div>
+    {% endif %}
+
+  </div>
+</div> 
+
+{% endblock %}

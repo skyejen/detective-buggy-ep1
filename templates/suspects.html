@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>📋 Suspect Board 📋</h2>
+
+<div class="static-navbar">
+    <a href="/evidence-board">Evidence Board</a> | 
+    <a href="/interview-lobby"
+    {% if final_lock %}style="pointer-events: none; opacity: 0.5; text-decoration: none; color: grey;"{% endif %}>
+    Interview Lobby</a>
+</div>
+
+<hr>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+{% if show_prof_ball or show_ball_quote %}
+
+<div class="static-frame">
+  <div class="static-frame-entry">
+
+    {% if show_prof_ball %}
+        <div class="center-static">
+            <p>👀 At the back of the room, almost in pitch darkness, you spot Professor Ball sitting alone, staring at the suspect board... You hear him humming softly...</p>
+            
+            <img src="{{ url_for('static', filename='img/scenes/professor-ball.png') }}"
+                            class="card-img-top suspect-photo-lg"
+                            alt="Professor Ball">
+            
+            <form method="post">
+                <button name="listen_prof_ball" class="my-btn image-bottom-line">Listen</button>
+            </form>
+        </div>
+
+    {% elif show_ball_quote %}
+        <div class="center-static">
+            <p><strong>Professor Ball:</strong> <em>"Some steal for hunger. Others steal to take away."</em></p>
+
+            <img src="{{ url_for('static', filename='img/scenes/professor-ball.png') }}"
+                class="card-img-top suspect-photo-lg"
+                alt="Professor Ball">
+        </div>
+
+    {% endif %}
+
+    </div>
+</div>
+
+{% endif %}
+
+<div class="container-sm my-5 p-4 rounded bg-dark text-white shadow suspect-section">
+    <div class="suspect-row">
+        {% for suspect in suspects %}
+        <div class="suspect-card-wrapper">
+            <div class="card bg-dark text-white shadow suspect-card h-100">
+                <img src="{{ url_for('static', filename='img/suspects/' ~ suspect.image_filename) }}"
+                     class="card-img-top suspect-photo-lg"
+                     alt="{{ suspect.name }}">
+
+                <div class="card-body">
+                    <h5 class="card-title suspect-name"><strong>{{ suspect.name }}</strong></h5>
+                    <p class="card-subtitle text-muted">{{ suspect.species }}</p>
+                    <p class="card-text suspect-description">{{ suspect.description }}</p>
+                    <p class="card-text">
+                        <strong>Alibi:</strong><br>
+                        {% if suspect.alibi_visible %}
+                            {{ suspect.alibi }}
+                        {% else %}
+                            <em>Unknown – gather more intel</em>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

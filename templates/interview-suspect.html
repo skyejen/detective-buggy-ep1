@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>⏳ Interview Room: {{ suspect['name'] }} ⏳</h2>
+
+<div class="static-navbar">
+  <a href="/interview-lobby">Interview Lobby</a> | <a href="/evidence-board">Evidence Board</a>
+</div>
+
+<hr>
+
+<p class="static-frame-opening">
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+
+<!-- If the interview is still ongoing, show the current line and Continue button -->
+{% if not show_log %}
+
+    <div class="static-frame">
+        
+      <div class="static-frame-entry center-static">
+
+      <!-- Intro line for immersion -->
+      <p><em>You enter the room. {{ suspect['name'] }} looks up, waiting for your questions...</em></p>
+
+          {% if suspect.name == "DS Cookie" %}
+            <img src="/static/img/interviews/interview-cookie.png" alt="DS Cookie" class="card-img-top evidence-photo wide-img">
+          {% elif suspect.name == "DC Banana" %}
+            <img src="/static/img/interviews/interview-banana.png" alt="DC Banana" class="card-img-top evidence-photo wide-img">
+          {% elif suspect.name == "DS Spoony" %}
+            <img src="/static/img/interviews/interview-spoony.png" alt="DS Spoony" class="card-img-top evidence-photo wide-img">
+          {% elif suspect.name == "PC Steven" %}
+            <img src="/static/img/interviews/interview-steven.png" alt="PC Steven" class="card-img-top evidence-photo wide-img">
+          {% elif suspect.name == "PC Noodle" %}
+            <img src="/static/img/interviews/interview-noodle.png" alt="PC Noodle" class="card-img-top evidence-photo wide-img">
+          {% elif suspect.name == "DS Theo" %}
+            <img src="/static/img/interviews/interview-theo.png" alt="DS Theo" class="card-img-top evidence-photo wide-img">
+          {% endif %}
+
+        {% if current_line %}
+        <!-- Show the current dialogue line -->
+          <div class="dialogue image-bottom-line">{{ suspect.name }}: <em>"{{ current_line['line'] | safe }}"</em></div>
+
+          <div class="interview-controls">
+            <!-- "Continue" form submits a POST request to fetch the next line -->
+            <form method="POST">
+              <button type="submit" class="my-btn">Continue</button>
+            </form>
+
+            <a href="{{ url_for('interview_lobby') }}" class="my-btn my-btn-secondary">Back</a>
+          </div>
+    {% endif %}
+
+    </div>
+  </div>
+
+
+<!-- If the interview is over - show a log of all dialogue lines -->
+{% else %}
+
+  <div class="static-frame"> 
+    <div class="static-frame-entry">
+
+      <p><em>The interview is over. DI Buggy flips through the log of what was said:</em></p>
+
+      <ul>
+        {% for line in dialogue_lines %}
+          <li><em>"{{ line['line'] }}"</em></li>
+        {% endfor %}
+      </ul>
+
+      <!-- Back button only -->
+      <div class="interview-controls">
+        <a href="{{ url_for('interview_lobby') }}" class="my-btn my-btn-secondary">Back</a>
+      </div>
+
+    {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}

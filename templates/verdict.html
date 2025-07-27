@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>⚖️ The Verdict ⚖️</h2>
+
+<hr>
+
+<div class="static-frame">
+  <div class="static-frame-entry center-static">
+
+  <!-- Endgame: victory/reg 15 -->
+  {% if win %}
+    <p>🎉 Justice has been served! The real culprit was indeed <strong>{{ guilty }}</strong>.</p>
+    <p><strong>{{ guilty }}</strong> had always nursed a bitter jealousy of DI Buggy’s flawless record. 
+      <br>He thought that claiming a chicken allergy would provide the perfect cover, but he underestimated Buggy’s nose for the truth.</p>
+    <p>
+      To cover his tracks, DS Spoony pressured DC Banana into corrupting the CCTV footage. 
+      <br>Young, nervous, and eager to please his seniors, DC Banana gave in — but when guilt started to show, 
+      <br>DS Spoony tied him up and stashed him in a supply closet.
+    </p>
+
+    <p>
+      Banana's safe now… though he might need a week off and a lot of cuddles.
+    </p>
+
+    <img src="{{ url_for('static', filename='img/scenes/endgame-victory.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="Endgame - Victory">
+
+    <p class="image-bottom-line">After serving a Reg 15 to <strong>{{ guilty }}</strong>, DI Buggy can sleep soundly tonight,<br>knowing the station is safe once more. 🍗🚓</p>
+
+    <hr>
+
+    <div class="off-to-archives">
+
+    <p class="archives-intro">
+      Congratulations on solving the case, officer! You displayed dogged determination!
+      <br>Now, visit the Archives to sign the station logs and view your investigation summary.
+    </p>
+
+    <form action="{{ url_for('archives') }}" method="GET">
+      <button type="submit" class="my-btn">📚 Enter Archives</button>
+    </form>
+
+
+  </div>
+
+  <!-- Endgame: defeat/cake fine -->
+  {% else %}
+    <p>You wrongly accused <strong>{{ accused }}</strong>. The real culprit walks free...</p>
+    {% if accused == "DS Cookie" %}
+      <p>DS Cookie may be fiery and stubborn, but she’s loyal to the bone.<br>Accusing her? That’s ruff, even for Buggy.</p>
+    {% elif accused == "PC Steven" %}
+      <p>PC Steven? The quiet gull who barely leaves the CCTV desk?<br>Perhaps Buggy let paranoia cloud his judgment this time.</p>
+    {% elif accused == "PC Noodle" %}
+      <p>PC Noodle — harmless, bumbling, obsessed with vending machines.<br>His only crime is poor snack choices, not chicken theft!</p>
+    {% elif accused == "DC Banana" %}
+      <p>DC Banana? The poor soul was hiding, terrified out of his peel. A victim, not a villain!</p>
+    {% elif accused == "DS Theo" %}
+      <p>DS Theo? Theo doesn't have such emotions, but Snakey is deeply offended on his behalf.</p>
+    {% else %}
+      <p>DI Buggy’s accusation missed the mark. The real culprit’s trail has gone cold...</p>
+    {% endif %}
+
+    <img src="{{ url_for('static', filename='img/scenes/endgame-defeat.png') }}"
+                    class="card-img-top suspect-photo-lg wide-img"
+                    alt="Endgame - Defeat">
+
+    <p class="image-bottom-line">Buggy will have to pay the price... a cake fine at the next station meeting. 🍰</p>
+
+      <hr>
+
+    <div class="off-to-archives">
+
+      <p class="archives-intro">
+        Officer, you did well investigating this case. Better luck next time.
+        <br>For now, visit the Archives to sign the station logs and view your investigation summary.
+      </p>
+
+      <form action="{{ url_for('archives') }}" method="GET">
+        <button type="submit" class="my-btn">📚 Enter Archives</button>
+      </form>
+
+    </div>
+  {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

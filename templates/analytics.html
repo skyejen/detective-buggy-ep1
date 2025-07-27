@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>📊 Playthrough Analytics 📊</h2>
+
+<ul>
+  <li><strong>Total:</strong> {{ stats.total }}</li>
+  <li><strong>Correct:</strong> {{ stats.correct }} ({{ stats.correct_pct }}%)</li>
+  <li><strong>Avg. Duration:</strong> {{ stats.avg_duration }} min</li>
+</ul>
+
+<hr>
+
+<table>
+  <thead>
+    <tr>
+      <th>Time</th>
+      <th>Player</th>
+      <th>Accused</th>
+      <th>Correct?</th>
+      <th>Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in playthroughs %}
+      <tr>
+        <td>{{ row.timestamp[:16].replace("T", " ") }}</td>
+        <td>{{ row.player_name or "—" }}</td>
+        <td>{{ row.accused_name }}</td>
+        <td>{{ "✅" if row.was_correct else "❌" }}</td>
+        <td>{{ row.duration_minutes or "below 1" }} min</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
