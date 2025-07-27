@@ -57,9 +57,12 @@ a.my-btn:visited {
 
 /* Hyperlinks */
 
+.theme-dark a {
+  text-align: center;
+}
+
 .navbar {
   color: #ffcc00;
-  text-align: center;
 }
 
 .theme-dark a.my-btn:visited {
