@@ -200,7 +200,7 @@ tr:hover {
 /* INTERVIEW LOBBY */
 
 .interview-entry {
-  background-image: url('/static/img/ui/interview_logbook_background_v3.png');
+  background-image: url('/static/img/ui/interview_logbook_background.webp');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: top center;

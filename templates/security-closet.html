@@ -26,13 +26,13 @@
 
       {% if line_index == 0 and not show_evidence %}
 
-        <img src="{{ url_for('static', filename='img/scenes/security-closet-door-open.png') }}"
+        <img src="{{ url_for('static', filename='img/scenes/security-closet-door-open.webp') }}"
                                 class="card-img-top suspect-photo-lg wide-img"
                                 alt="The Security Closet Door Open">
 
       {% elif line_index == 1 or line_index == 2 and not show_evidence %}
             
-        <img src="{{ url_for('static', filename='img/scenes/sobbing-banana.png') }}"
+        <img src="{{ url_for('static', filename='img/scenes/sobbing-banana.webp') }}"
                           class="card-img-top suspect-photo-lg wide-img"
                           alt="Sobbing Banana">
 
@@ -65,17 +65,17 @@
         <div class="card bg-dark text-white shadow evidence-card h-100">
                    
           {% if item.name == "Theo's Biscuit" %}
-            <img src="/static/img/evidence/security-closet/biscuit.png" alt="Biscuit" class="card-img-top evidence-photo">
+            <img src="/static/img/evidence/security-closet/biscuit.webp" alt="Biscuit" class="card-img-top evidence-photo">
           {% elif item.name == "Abandoned Mug" %}
-            <img src="/static/img/evidence/security-closet/mug.png" alt="Mug" class="card-img-top evidence-photo">
+            <img src="/static/img/evidence/security-closet/mug.webp" alt="Mug" class="card-img-top evidence-photo">
           {% elif item.name == "Rusty Stain" %}
-            <img src="/static/img/evidence/security-closet/stain.png" alt="Stain" class="card-img-top evidence-photo">
+            <img src="/static/img/evidence/security-closet/stain.webp" alt="Stain" class="card-img-top evidence-photo">
           {% elif item.name == "Vending Machine Stickers" %}
-            <img src="/static/img/evidence/security-closet/stickers.png" alt="Stickers" class="card-img-top evidence-photo">
+            <img src="/static/img/evidence/security-closet/stickers.webp" alt="Stickers" class="card-img-top evidence-photo">
           {% elif item.name == "Stilts With Bird Feet" %}
-            <img src="/static/img/evidence/security-closet/stilts.png" alt="Stilts" class="card-img-top evidence-photo">
+            <img src="/static/img/evidence/security-closet/stilts.webp" alt="Stilts" class="card-img-top evidence-photo">
           {% else %}
-            <img src="/static/img/evidence/crime-scene/default.png" alt="Unknown Evidence">
+            <img src="/static/img/evidence/crime-scene/default.webp" alt="Unknown Evidence">
           {% endif %}
 
 

@@ -13,12 +13,12 @@ CREATE TABLE suspects (
 );
 
 INSERT INTO suspects (name, description, species, alibi, is_guilty, image_filename) VALUES
-    ("DS Cookie", "A fiery calico officer with a short temper but a good heart. Loves order, hates moths.", "Cat", "Keeping the station safe from airborne threats.", 0, "cookie.png"),
-    ("PC Steven", "A quiet seagull on CCTV duty. Keeps his answers short, which makes him seem disinterested — but he’s just not one for small talk.", "Seagull", "Monitoring the security room feeds.", 0, "steven.png"),
-    ("DS Spoony", "A smug but usually harmless officer. Has a sharp tongue and a rough past.", "Spoon", "Claims to have a chicken allergy.", 1, "spoony.png"),
-    ("PC Noodle", "Utterly useless but weirdly loveable. Thinks he’s helping. Usually makes things worse. Obsessed with vending machines.", "Seahorse", "Nowhere near the crime scene. Hopefully.", 0, "noodle.png"),
-    ("DC Banana", "A sweet new recruit on probation. Nervous but eager. Looks up to senior officers.", "Banana", "Was... missing?", 0, "banana.png"),
-    ("DS Theo", "Retired from active duty. Known for his calm wisdom and perfect cup of tea. Often found filing evidence with Snakey, his loyal green companion.", "Dog", "In the Archives with Snakey, filing evidence.", 0, "theo.png");
+    ("DS Cookie", "A fiery calico officer with a short temper but a good heart. Loves order, hates moths.", "Cat", "Keeping the station safe from airborne threats.", 0, "cookie.webp"),
+    ("PC Steven", "A quiet seagull on CCTV duty. Keeps his answers short, which makes him seem disinterested — but he’s just not one for small talk.", "Seagull", "Monitoring the security room feeds.", 0, "steven.webp"),
+    ("DS Spoony", "A smug but usually harmless officer. Has a sharp tongue and a rough past.", "Spoon", "Claims to have a chicken allergy.", 1, "spoony.webp"),
+    ("PC Noodle", "Utterly useless but weirdly loveable. Thinks he’s helping. Usually makes things worse. Obsessed with vending machines.", "Seahorse", "Nowhere near the crime scene. Hopefully.", 0, "noodle.webp"),
+    ("DC Banana", "A sweet new recruit on probation. Nervous but eager. Looks up to senior officers.", "Banana", "Was... missing?", 0, "banana.webp"),
+    ("DS Theo", "Retired from active duty. Known for his calm wisdom and perfect cup of tea. Often found filing evidence with Snakey, his loyal green companion.", "Dog", "In the Archives with Snakey, filing evidence.", 0, "theo.webp");
 
 
 --------------------- evidence table
@@ -46,18 +46,18 @@ INSERT INTO evidence (name, description, category, location, suspect_id, always_
     ("Missing Banana", "Probationer Banana failed to report for duty today.", "note", "Briefing Room", 5, 1, "TBC", "Briefing", NULL),
 
     -- Cookie (1) --
-    ("Furball", "A suspicious clump of calico fur found inside Buggy's desk drawer.", "clue", "Crime Scene", 1, 0, "Inspect Furball", "Crime Scene", "furball.png"),
+    ("Furball", "A suspicious clump of calico fur found inside Buggy's desk drawer.", "clue", "Crime Scene", 1, 0, "Inspect Furball", "Crime Scene", "furball.webp"),
     ("Furball Explanation", "Cookie claimed she had been chasing a moth before the crime took place.", "record", "Interview Room", 1, 0, "TBC", "Interview with DS Cookie", NULL),
 
     -- Steven (2) --
-    ("Bird Footprints", "Suspicious bird-like footprints.", "clue", "Crime Scene", 2, 0, "Inspect Bird Footprints", "Crime Scene", "birdprints.png"),
-    ("CCTV Footage", "Footage from the time of the crime. Can only be viewed in the Security Room.", "clue", "Interview Room", 2, 0, "Play CCTV Footage", "Interview with PC Steven", "cctv-footage.png"),
+    ("Bird Footprints", "Suspicious bird-like footprints.", "clue", "Crime Scene", 2, 0, "Inspect Bird Footprints", "Crime Scene", "birdprints.webp"),
+    ("CCTV Footage", "Footage from the time of the crime. Can only be viewed in the Security Room.", "clue", "Interview Room", 2, 0, "Play CCTV Footage", "Interview with PC Steven", "cctv-footage.webp"),
 
     -- Spoony (3) --
     ("Chicken Treat Food Allergy", "Spoony claimed to be allergic to chicken treats.", "record", "Interview Room", 3, 0, "TBC", "Interview with DS Spoony", NULL),
     ("Spoony's Sunday Shift", "Claimed that he worked in Records on Sunday. These guys are in another building and don't have access to my office.", "record", "Interview Lobby", 3, 0, "TBC", "Interview with DS Spoony", NULL),
-    ("Stilts With Bird Feet", "Suspiciously looking stilts. What on earth?", "clue", "Security Room", 3, 0, "Inspect Stilts With Bird Feet", "Security Room Closet", "stilts.png"),
-    ("Rusty Stain", "There’s a rust-colored stain inside the Security Room’s closet.", "clue", "Security Room", 3, 0, "Inspect Rusty Stain", "Security Room Closet", "stain.png"),
+    ("Stilts With Bird Feet", "Suspiciously looking stilts. What on earth?", "clue", "Security Room", 3, 0, "Inspect Stilts With Bird Feet", "Security Room Closet", "stilts.webp"),
+    ("Rusty Stain", "There’s a rust-colored stain inside the Security Room’s closet.", "clue", "Security Room", 3, 0, "Inspect Rusty Stain", "Security Room Closet", "stain.webp"),
     ("Professor Ball's Comment", "Scribbled message: 'Some steal for hunger. Others steal to take away.'", "note", "Suspects", 3, 0, "Interact with Professor Ball", "Suspects", NULL),
     ("Locker Room Access", "After overhearing PC Noodle grumble, Buggy began to suspect the locker room might be hiding something.", "note", "Interview Lobby", 3, 0, "TBC", "Buggy's Thoughts", NULL),
 
@@ -72,14 +72,14 @@ INSERT INTO evidence (name, description, category, location, suspect_id, always_
     ("Contradictory Alibi", "Spoony claimed he worked Sunday, but the Records Room was closed.", "record", "Interview Lobby", 3, 0, "TBC", "Overheard PC Noodle", NULL),
 
     -- Flavour items: Crime Scene
-    ("Lost Tennis Ball", "Buggy sniffed out an old tennis ball. Probably from training days.", "flavour", "Crime Scene", NULL, 0, "Sniff Tennis Ball", "Crime Scene", "tennis-ball.png"),
-    ("Chewed-Up Report", "A chewed-up incident report. Must be the new probationer?", "flavour", "Crime Scene", NULL, 0, "Inspect Chewed Report", "Crime Scene", "police-report.png"),
-    ("Mystery Moth", "A moth flutters by. Damaged wing?", "flavour", "Crime Scene", NULL, 0, "Inspect Moth", "Crime Scene", "moth.png"),
+    ("Lost Tennis Ball", "Buggy sniffed out an old tennis ball. Probably from training days.", "flavour", "Crime Scene", NULL, 0, "Sniff Tennis Ball", "Crime Scene", "tennis-ball.webp"),
+    ("Chewed-Up Report", "A chewed-up incident report. Must be the new probationer?", "flavour", "Crime Scene", NULL, 0, "Inspect Chewed Report", "Crime Scene", "police-report.webp"),
+    ("Mystery Moth", "A moth flutters by. Damaged wing?", "flavour", "Crime Scene", NULL, 0, "Inspect Moth", "Crime Scene", "moth.webp"),
 
     -- Flavour items: Security Closet
-    ("Abandoned Mug", "A dusty mug with 'World's Best Pawfficer' written on it.", "flavour", "Security Room Closet", NULL, 0, "Inspect Mug", "Security Room Closet", "mug.png"),
-    ("Theo's Biscuit", "Dry. Unidentifiable. Still smells tasty. Must be Theo's.", "flavour", "Security Room Closet", NULL, 0, "Inspect Biscuit", "Security Room Closet", "biscuit.png"),
-    ("Vending Machine Stickers", "A vending machine sticker pack. Interesting choice.", "flavour", "Security Room Closet", NULL, 0, "Flip through stickers", "Security Room Closet", "stickers.png");
+    ("Abandoned Mug", "A dusty mug with 'World's Best Pawfficer' written on it.", "flavour", "Security Room Closet", NULL, 0, "Inspect Mug", "Security Room Closet", "mug.webp"),
+    ("Theo's Biscuit", "Dry. Unidentifiable. Still smells tasty. Must be Theo's.", "flavour", "Security Room Closet", NULL, 0, "Inspect Biscuit", "Security Room Closet", "biscuit.webp"),
+    ("Vending Machine Stickers", "A vending machine sticker pack. Interesting choice.", "flavour", "Security Room Closet", NULL, 0, "Flip through stickers", "Security Room Closet", "stickers.webp");
 
 
 --------------------- dialogues table

@@ -28,7 +28,7 @@
       <div id="scene-content">
         <p>The footage is corrupted. Something’s not right.</p>
 
-        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.webp') }}"
                     class="card-img-top suspect-photo-lg wide-img"
                     alt="The Security Room">
 
@@ -74,7 +74,7 @@
       {% elif session.get("heard_banana") and not found_banana %}
         <p>You hear a faint sobbing coming from the supply closet nearby...</p>
 
-        <img src="{{ url_for('static', filename='img/scenes/security-closet-door.png') }}"
+        <img src="{{ url_for('static', filename='img/scenes/security-closet-door.webp') }}"
                     class="card-img-top suspect-photo-lg wide-img"
                     alt="The Security Closet Door">
 
@@ -98,7 +98,7 @@
 
         <p>The footage is corrupted. Something’s not right.</p>
 
-        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.webp') }}"
                     class="card-img-top suspect-photo-lg wide-img"
                     alt="The Security Room">
 
@@ -108,7 +108,7 @@
       <!-- Default revisit after footage and denial, but nothing else -->
       {% else %}
 
-        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+        <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.webp') }}"
                     class="card-img-top suspect-photo-lg wide-img"
                     alt="The Security Room">
 
@@ -124,7 +124,7 @@
       <p>You find the security terminal. Time to play the CCTV footage from the time of the incident.</p>
 
 
-      <img src="{{ url_for('static', filename='img/scenes/security-room.png') }}"
+      <img src="{{ url_for('static', filename='img/scenes/security-room.webp') }}"
                     class="card-img-top suspect-photo-lg wide-img"
                     alt="The Security Room">
 
@@ -135,7 +135,7 @@
     {% elif seen_room and not session.get("steven_denial_shown") %}
       <!-- Edge case/fallback: corrupted footage present but Steven’s denial not flagged -->
 
-      <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.png') }}"
+      <img src="{{ url_for('static', filename='img/scenes/security-room-corrupted.webp') }}"
                     class="card-img-top suspect-photo-lg wide-img"
                     alt="The Security Room">
 
