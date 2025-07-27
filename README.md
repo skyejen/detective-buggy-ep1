@@ -28,13 +28,16 @@ Ensure python-dotenv is installed and a .env file exists for your secret keys (i
 This project is deployed using Render.
 Deployment instructions or render.yaml will be added in a future update.
 
-🔗 Live link: Coming soon
+🔗 **Live version:** [https://detective-buggy-ep1.onrender.com](https://detective-buggy-ep1.onrender.com)
 
 ## 🛠️ Potential Improvements
 A list of potential improvements for future versions:
 
+- 🚀 Improve image loading speed by converting to WebP and/or lazy-loading static assets, or using CDN
 - ✅ Replace some hardcoded logic with dynamic, database-driven content
-- 📱 Improve layout and styling for mobile and small screens
+- 🧠 Migrate from SQLite to Postgres for data persistence across deploys
+- 🗃️ Consider managed DBs like Supabase or Railway
+- 📱 Improve layout and styling for mobile and small screens (currently not supported)
 - 🎨 Add simple animations for visual polish
 - 🎵 Add audio support (ambience, barks, feedback sounds)
 - 👣 Track player decisions for enhanced analytics *(note: analytics is currently private and optional)*
