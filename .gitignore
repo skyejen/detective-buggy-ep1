@@ -4,3 +4,4 @@ venv/
 todos.txt
 braindump.txt
 .DS_Store
+flask_session/
