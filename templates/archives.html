@@ -39,11 +39,20 @@
 
     <hr>
 
-    <div class="station-footer-cta">
+    <!-- <div class="station-footer-cta">
         <form action="{{ url_for('index') }}" method="POST">
             <button type="submit" class="my-btn restart">🔄 Play Again</button>
         </form>
+    </div> -->
+
+    <div class="station-footer-cta d-flex justify-content-center gap-3">
+        <form action="{{ url_for('index') }}" method="POST">
+            <button type="submit" class="my-btn restart">🔄 Play Again</button>
+        </form>
+
+        <a href="{{ url_for('credits') }}" class="my-btn">📜 View Credits</a>
     </div>
+
 
 
   </div>

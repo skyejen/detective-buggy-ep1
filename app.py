@@ -887,6 +887,72 @@ def submit_name():
 
     return redirect(url_for("archives"))
 
+# Credits & Behind the Scenes
+@app.route("/credits")
+def credits():
+
+    cast = [
+        {
+            "name": "DI Buggy",
+            "front_img": "img/scenes/buggy-title-screen.webp",
+            "back_img": "img/credits/buggy-real.webp",
+            "pos_front": "60% 10%",
+            "pos_back": "center"
+        },
+        {
+            "name": "DS Cookie",
+            "front_img": "img/suspects/cookie.webp",
+            "back_img": "img/credits/cookie-real.webp",
+            "pos_front": "40% 30%",
+            "pos_back": "40% 90%",
+        },
+        {
+            "name": "DS Theo",
+            "front_img": "img/suspects/theo.webp",
+            "back_img": "img/credits/theo-real.webp",
+            "pos_front": "40% 15%",
+            "pos_back": "40% 65%",
+        },
+        {
+            "name": "PC Noodle",
+            "front_img": "img/suspects/noodle.webp",
+            "back_img": "img/credits/noodle-real.webp",
+            "pos_front": "40% 15%",
+            "pos_back": "center"
+        },
+        {
+            "name": "DS Steven",
+            "front_img": "img/suspects/steven.webp",
+            "back_img": "img/credits/steven-real.webp",
+            "pos_front": "40% 25%",
+            "pos_back": "center"
+        },
+        {
+            "name": "DC Banana",
+            "front_img": "img/suspects/banana.webp",
+            "back_img": "img/credits/banana-real.webp",
+            "pos_front": "40% 67%",
+            "pos_back": "center"
+        },
+        {
+            "name": "DS Spoony",
+            "front_img": "img/suspects/spoony.webp",
+            "back_img": "img/credits/spoony-real.webp",
+            "pos_front": "40% 27%",
+            "pos_back": "40% 25%",
+        },
+        {
+            "name": "Professor Ball",
+            "front_img": "img/scenes/professor-ball.webp",
+            "back_img": "img/credits/professor-ball-real.webp",
+            "pos_front": "15% 10%",
+            "pos_back": "15% 50%",
+        },
+    ]
+
+    return render_template("credits.html", cast=cast)
+
+
 # Internal only
 @app.route("/analytics")
 def analytics():

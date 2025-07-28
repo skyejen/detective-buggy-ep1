@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>📽️ Credits 📽️</h2>
+
+<hr>
+
+<div class="static-frame">
+  <div class="static-frame-entry center-static">
+
+    <h3 class="cast-header">🎭 The Cast 🎭</h3>
+
+    <div class="card-grid">
+        {% for character in cast %}
+            <div class="card-container">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img src="{{ url_for('static', filename=character.front_img) }}" 
+                                alt="{{ character.name }}" 
+                                style="object-position: {{ character.pos_front }}"> 
+                        </div>
+                        <div class="flip-card-back">
+                            <img src="{{ url_for('static', filename=character.back_img) }}" 
+                                alt="Real {{ character.name }}" 
+                                style="object-position: {{ character.pos_back }}"> 
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center mt-2">{{ character.name }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <div class="special-thanks"></div>
+
+        <h3>🌟 Special Thanks 🌟</h3>
+
+        <p class="lead">
+            To the mentors, friends, and one heroic beagle who cheered, challenged, and&nbsp;carried&nbsp;me through my tech journey — sometimes without even realising it:
+        </p>
+
+        <div class="special-thanks-list">
+            <p>🏹 <span class="gratitude-highlight">DCI Longbow</span> — for character backstories, constant encouragement, and lots of lemon & chili pasta</p>
+            <!-- Malan made me believe I could code AND cry at the same time 💻😭 -->
+            <p>🎓 <span class="gratitude-highlight">Professor David J. Malan</span> and <span class="gratitude-highlight">the entire CS50x team</span> — for breaking through years of self-doubt with teaching so engaging, kind, and empowering that I stopped saying “I can’t do this”<br>and started saying “let’s go!”</p>
+            <p>🫂 <span class="gratitude-highlight">xenik</span> — for tirelessly telling me I can do it, year after year (and sending me CS50x all those years ago!)</p>
+            <p>🛠 <span class="gratitude-highlight">achia</span>, <span class="gratitude-highlight">ale__17</span> & <span class="gratitude-highlight">CoolBeans™</span> — for letting me explore techy stuff when I was supposed to&nbsp;focus&nbsp;on&nbsp;localisation</p>  
+            <p>🌟 <span class="gratitude-highlight">doom</span>, <span class="gratitude-highlight">sdyer</span> & <span class="gratitude-highlight">ttabori</span> — for mentorship, support, and fierce encouragement</p>
+            <p>🤍 <span class="gratitude-highlight">r12s</span> — for trusting me with more than I thought I could handle,<br>and <span class="gratitude-highlight">olivato</span> & <span class="gratitude-highlight">ltafarel</span> — for being absolute legends and lifting me further</p>
+            <p>🚀 <span class="gratitude-highlight">jargon</span>, <span class="gratitude-highlight">atomicgamer34</span>, <span class="gratitude-highlight">kakarot</span> & <span class="gratitude-highlight">Scythe</span> — for making me feel like I belong and for building me up, day after day</p>
+            <p>🫶 <span class="gratitude-highlight">Helga</span>, <span class="gratitude-highlight">Ainura</span>, <span class="gratitude-highlight">Sofya</span> & <span class="gratitude-highlight">Diana</span> — for the joy, sanity, and support that kept my brain compiling</p>
+            <p class="buggy-line">🐶 <span class="gratitude-highlight">Buggy</span> — for being the goodest boy and the detective I wish I could be</p>
+        </div>
+
+        <p class="faded"><em>I built this with borrowed courage. Thank you for lending it 💛</em></p>
+
+        <div class="station-footer-cta text-center mt-4">
+            <a href="{{ url_for('archives') }}" class="my-btn">🔙 Back to Archives</a>
+        </div>
+
+    </div>
+
+
+  </div>
+</div>
+
+{% endblock %}

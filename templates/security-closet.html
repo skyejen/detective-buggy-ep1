@@ -85,7 +85,7 @@
               {% if item.id in session['unlocked_evidence'] or item.id in unlocked_flavour %}
                 <button type="submit" disabled class="my-btn">🔓 {{ item.name }}</button>
               {% else %}
-                <button type="submit" class="my-btn">{{ item.label }}</button>
+                <button type="submit" class="my-btn">{{ item.label | safe }}</button>
               {% endif %}
             </form>
           </div>
