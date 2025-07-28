@@ -79,11 +79,13 @@ A list of potential improvements for future versions:
 
 - ✅ Replace some hardcoded logic with dynamic, database-driven content
 - ➡️ Replace repeated SQL cursor/connection logic with a fetch_all() helper for cleaner and safer DB access
+- 🐣 Still using one DB connection per request; OK for now but may refactor to use pooling
 - 🗃️ Migrate over Supabase (or Railway) for learning & since Render Postgres auto-expires
 - 🎨 Add simple animations for visual polish
 - 🎵 Add audio support (ambience, barks, feedback sounds)
 - 👣 Track player decisions for enhanced analytics *(note: analytics is currently private and optional)*
 - 🪄 Fix line-breaks (yes, 8 years in localisation?.. good line-breaks is life!)
+- 🧪 Lacks automated tests — unit testing DB/session logic is a future (fun) goal
 - 💾 [Stretch Goal] Implement user login/save progress system — not required for a small game, but a great learning opportunity!
 
 ## 👤 Credits
