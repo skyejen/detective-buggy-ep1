@@ -13,23 +13,18 @@ load_dotenv()
 
 def get_db_connection():
     db_url = os.getenv("DATABASE_URL")
-
     result = urlparse(db_url)
-    username = result.username
-    password = result.password
-    database = result.path[1:]
-    hostname = result.hostname
-    port = result.port
 
     conn = psycopg2.connect(
-        database=database,
-        user=username,
-        password=password,
-        host=hostname,
-        port=port,
-        cursor_factory=DictCursor 
+        host=result.hostname,
+        database=result.path[1:],
+        user=result.username,
+        password=result.password,
+        port=result.port or 5432,
+        cursor_factory=DictCursor
     )
     return conn
+
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
