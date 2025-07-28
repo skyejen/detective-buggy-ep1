@@ -16,13 +16,37 @@ Built using **Python**, **Flask**, **Jinja2**, **Bootstrap**, and **SQLite** —
 
 Clone the repo and install dependencies:
 
-```
-bash
+```bash
 pip install -r requirements.txt
 flask run
 ```
 
+💡 If flask run doesn’t work, try setting ```FLASK_APP=app.py``` or running ```python app.py``` directly.
+
 Ensure python-dotenv is installed and a .env file exists for your secret keys (if applicable).
+
+### ⚠️ Recommended Python Version
+
+**Python 3.10.x is recommended**  
+Some dependencies may not work properly with newer versions (e.g. 3.12+), due to compatibility issues with libraries like Flask or SQLAlchemy.
+
+We recommend using a **virtual environment (`venv`)** to avoid issues across setups.
+
+<details>
+<summary>Set up a virtual environment</summary>
+
+```bash
+# Make sure Python 3.10 is installed
+python3.10 -m venv venv
+
+# Activate it:
+source venv/bin/activate       # macOS / Linux
+venv\Scripts\activate          # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
+</details>
 
 ## 🌐 Hosting
 This project is deployed using Render.
