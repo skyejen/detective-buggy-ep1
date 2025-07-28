@@ -25,7 +25,7 @@
             <p>Thanks for playing! If you'd like to sign your name in the station logs, enter it below:</p>
 
             <div class="station-cta-row">
-                <form method="post" action="{{ url_for('submit_name') }}">
+                <form method="post" action="{{ url_for('submit_name') }}" class="archives-form">
                     <input type="text" name="player_name" placeholder="Enter your name" id="player_name" maxlength="100" autocomplete="off">
                     <button type="submit" class="my-btn">✍️ Sign station logs</button>
                 </form>

@@ -84,6 +84,7 @@ A list of potential improvements for future versions:
 - 🎨 Add simple animations for visual polish
 - 🎵 Add audio support (ambience, barks, feedback sounds)
 - 👣 Track player decisions for enhanced analytics *(note: analytics is currently private and optional)*
+- 🪄 Fix line-breaks (yes, 8 years in localisation?.. good line-breaks is life!)
 - 💾 [Stretch Goal] Implement user login/save progress system — not required for a small game, but a great learning opportunity!
 
 ## 👤 Credits
