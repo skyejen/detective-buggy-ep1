@@ -80,7 +80,6 @@ A list of potential improvements for future versions:
 - ✅ Replace some hardcoded logic with dynamic, database-driven content
 - ➡️ Replace repeated SQL cursor/connection logic with a fetch_all() helper for cleaner and safer DB access
 - 🗃️ Migrate over Supabase (or Railway) for learning & since Render Postgres auto-expires
-- 📱 Improve layout and styling for mobile and small screens (currently not supported)
 - 🎨 Add simple animations for visual polish
 - 🎵 Add audio support (ambience, barks, feedback sounds)
 - 👣 Track player decisions for enhanced analytics *(note: analytics is currently private and optional)*
