@@ -4,13 +4,35 @@ Detective Inspector Buggy returns to the station... only to find his precious ch
 
 This is a lighthearted mystery game built as part of my CS50x final project.
 
-Built using **Python**, **Flask**, **Jinja2**, **Bootstrap**, and **SQLite** — with some (not) very serious paws-on QA 🐶
+It was also my first deployed Flask project, and it taught me a ton: managing scope, balancing logic with storytelling, handling real user input, creating routes and endpoints, and passing information between backend and frontend. I got much more comfortable with Git and GitHub, learned how to deploy with Render, and worked with databases — starting with SQLite and later migrating to PostgreSQL.
+
+There’s definitely room for improvement (session handling, conditional logic in Jinja, and some DB queries could be cleaner), but I’m proud of how much I learned — and deeply grateful for the support I had to finish it. It was terrifying at first, but I did it. 🧠✨
+
+Built using **Python**, **Flask**, **Jinja2**, **Bootstrap**, and **PostgreSQL** — with some (not very serious) paws-on QA 🐶
+
+🔗 **Live version:** [https://detective-buggy-ep1.onrender.com](https://detective-buggy-ep1.onrender.com)
 
 ## 🚀 Features
 - 🎤 Interactive suspect interviews
 - 🧠 Clue-based deduction system
 - 🗣️ Adaptive dialogue based on player progress
 - 🗂️ Evidence board & branching logic
+
+## 🖼️ Screenshots
+
+<details>
+<summary>Click to expand screenshots</summary>
+
+### Title Screen
+<img src="screenshots/title-screen.png" width="800"/>
+
+### Suspect Board
+<img src="screenshots/suspect-board.png" width="800"/>
+
+### Briefing Screen
+<img src="screenshots/briefing-screen.png" width="800"/>
+
+</details>
 
 ## 🛠️ Run Locally
 
@@ -52,14 +74,12 @@ pip install -r requirements.txt
 This project is deployed using Render.
 Deployment instructions or render.yaml will be added in a future update.
 
-🔗 **Live version:** [https://detective-buggy-ep1.onrender.com](https://detective-buggy-ep1.onrender.com)
-
 ## 🛠️ Potential Improvements
 A list of potential improvements for future versions:
 
 - ✅ Replace some hardcoded logic with dynamic, database-driven content
-- 🧠 Migrate from SQLite to Postgres for data persistence across deploys
-- 🗃️ Consider managed DBs like Supabase or Railway
+- ➡️ Replace repeated SQL cursor/connection logic with a fetch_all() helper for cleaner and safer DB access
+- 🗃️ Migrate over Supabase (or Railway) for learning & since Render Postgres auto-expires
 - 📱 Improve layout and styling for mobile and small screens (currently not supported)
 - 🎨 Add simple animations for visual polish
 - 🎵 Add audio support (ambience, barks, feedback sounds)

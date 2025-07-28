@@ -23,17 +23,17 @@
         <div class="static-frame-entry">
 
         <!-- Buggy's Initial Thoughts -->
-        <div id="popup-initial">
+        <div id="popup-initial" style="text-align: center;">
             <p>💭 DI Buggy is thinking: <em>"Corrupted footage... and now birdlike prints at the crime scene?<br>Could PC Steven have done this?"</em></p>
             <button id="popup-continue-btn" class="my-btn">🕵️ Continue</button>
         </div>
 
         <!-- Accusation Options -->
-        <div id="popup-accusation" style="display: none;">
+        <div id="popup-accusation" style="display: none; text-align: center;">
             <h2>🕵️ Make an Accusation?</h2>
                 <p><strong>🕵️ At this point in the story, you may have enough information to make an accusation.</strong><br>How would you like to proceed?</p>
 
-            <div class="modal-button-row">
+            <div class="accusation-page-buttons">
                 <form method="POST" action="{{ url_for('accuse') }}">
                     <input type="hidden" name="popup_dismissed" value="1">
                     <button name="choice" value="accuse" class="my-btn">Make an Accusation</button>

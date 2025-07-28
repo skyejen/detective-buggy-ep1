@@ -4,7 +4,7 @@
 <h2>⏳ Interview Room: {{ suspect['name'] }} ⏳</h2>
 
 <div class="static-navbar">
-  <a href="/interview-lobby" class="buggy-navbar">Interview Lobby</a> | <a href="/evidence-board" class="buggy-navbar">Evidence Board</a>
+  <a href="/evidence-board" class="buggy-navbar">Evidence Board</a> | <a href="/interview-lobby" class="buggy-navbar">Interview Lobby</a>
 </div>
 
 <hr>
@@ -72,7 +72,7 @@
 
       <ul>
         {% for line in dialogue_lines %}
-          <li><em>"{{ line['line'] }}"</em></li>
+          <li><em>"{{ line['line'] | safe }}"</em></li>
         {% endfor %}
       </ul>
 

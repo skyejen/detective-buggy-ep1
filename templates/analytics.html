@@ -24,7 +24,7 @@
   <tbody>
     {% for row in playthroughs %}
       <tr>
-        <td>{{ row.timestamp[:16].replace("T", " ") }}</td>
+        <td>{{ row.timestamp.strftime("%Y-%m-%d %H:%M") }}</td>
         <td>{{ row.player_name or "—" }}</td>
         <td>{{ row.accused_name }}</td>
         <td>{{ "✅" if row.was_correct else "❌" }}</td>

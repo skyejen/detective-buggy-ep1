@@ -1,17 +1,34 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for, Response
+from flask import Flask, render_template, request, redirect, session, flash, url_for, Response, send_from_directory
 from flask_session import Session
 import random
-import sqlite3
 from datetime import datetime # This is for playthrough analytics
 from dotenv import load_dotenv
 import os
+import psycopg2 # Added when migrated to PostgreSQL
+from urllib.parse import urlparse # Added when migrated to PostgreSQL
+from psycopg2.extras import DictCursor
+
 
 load_dotenv()
 
-# Open connection with raw SQL
 def get_db_connection():
-    conn = sqlite3.connect("data.db")
-    conn.row_factory = sqlite3.Row  # this addition allows column access by name
+    db_url = os.getenv("DATABASE_URL")
+
+    result = urlparse(db_url)
+    username = result.username
+    password = result.password
+    database = result.path[1:]
+    hostname = result.hostname
+    port = result.port
+
+    conn = psycopg2.connect(
+        database=database,
+        user=username,
+        password=password,
+        host=hostname,
+        port=port,
+        cursor_factory=DictCursor 
+    )
     return conn
 
 app = Flask(__name__)
@@ -125,9 +142,14 @@ def crime_scene():
     # Create evidence list once, save order in session
     if "crime_scene_evidence_order" not in session:
         with get_db_connection() as conn:
-            raw_evidence = conn.execute(
-                "SELECT id, name, label, category, description, image_filename FROM evidence WHERE LOWER(location) = 'crime scene'"
-            ).fetchall()
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT id, name, label, category, description, image_filename
+                FROM evidence
+                WHERE LOWER(location) = 'crime scene'
+            """)
+            raw_evidence = cur.fetchall()
+            cur.close()
 
             raw_evidence = [dict(row) for row in raw_evidence]
 
@@ -144,14 +166,18 @@ def crime_scene():
     else:
         # Load based on stored order
         with get_db_connection() as conn:
+            cur = conn.cursor()
             mixed = []
             for eid in session["crime_scene_evidence_order"]:
-                row = conn.execute(
-                    "SELECT id, name, label, category, description, image_filename FROM evidence WHERE id = ?",
+                cur.execute(
+                    "SELECT id, name, label, category, description, image_filename FROM evidence WHERE id = %s",
                     (eid,)
-                ).fetchone()
+                )
+                row = cur.fetchone()
                 if row:
-                    mixed.append(dict(row)) # Converting to dict so can pull images in html
+                    mixed.append(dict(row))
+            cur.close()
+
 
 
     # Evidence button logic + flash
@@ -215,7 +241,10 @@ def crime_scene():
 @app.route("/suspects", methods=["GET", "POST"])
 def show_suspects():
     with get_db_connection() as conn:
-        suspects = conn.execute("SELECT * FROM suspects").fetchall()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM suspects")
+        suspects = cur.fetchall()
+        cur.close()
 
     final_lock = session.get("final_lock", False)
 
@@ -274,7 +303,10 @@ def evidence_board():
     maybe_trigger_noodle()
 
     with get_db_connection() as conn:
-        all_evidence = conn.execute("SELECT * FROM evidence").fetchall()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM evidence")
+        all_evidence = [dict(row) for row in cur.fetchall()]
+        cur.close()
 
     unlocked = session.get("unlocked_evidence", [])
 
@@ -308,14 +340,18 @@ def interview_lobby():
 
     # Get suspects from the database
     with get_db_connection() as conn:
-        suspects = conn.execute("SELECT * FROM suspects").fetchall()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM suspects")
+        suspects = cur.fetchall()
 
         # Dialogue counts per suspect (so we know when interviews are complete)
-        dialogue_counts = conn.execute("""
+        cur.execute("""
             SELECT suspect_id, COUNT(*) as count
             FROM dialogues
             GROUP BY suspect_id
-        """).fetchall()
+        """)
+        dialogue_counts = cur.fetchall()
+        cur.close()
 
     # Turn dialogue_counts into a dictionary ({ suspect_id: count})
     # This helps us quickly look up how many lines each suspect has
@@ -403,11 +439,17 @@ def interview_lobby():
 @app.route("/interview-lobby/<int:suspect_id>", methods=["GET", "POST"])
 def interview_suspect(suspect_id):
     with get_db_connection() as conn:
-        suspect = conn.execute("SELECT * FROM suspects WHERE id = ?", (suspect_id,)).fetchone()
-        dialogue_lines = conn.execute("SELECT * FROM dialogues WHERE suspect_id = ?", (suspect_id,)).fetchall()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM suspects WHERE id = %s", (suspect_id,))
+        suspect = cur.fetchone()
+
+        cur.execute("SELECT * FROM dialogues WHERE suspect_id = %s", (suspect_id,))
+        dialogue_lines = cur.fetchall()
 
         # Pre-fetch evidence for fast access
-        evidence_lookup = conn.execute("SELECT id, name FROM evidence").fetchall()
+        cur.execute("SELECT id, name FROM evidence")
+        evidence_lookup = cur.fetchall()
+        cur.close()
 
     if not suspect:
         return "Suspect not found", 404
@@ -603,11 +645,14 @@ def security_closet():
     if show_evidence:
         if "closet_evidence_order" not in session:
             with get_db_connection() as conn:
-                raw_evidence = conn.execute("""
+                cur = conn.cursor()
+                cur.execute("""
                     SELECT id, name, label, category, description
                     FROM evidence
-                    WHERE origin = ? AND (category = 'clue' OR category = 'flavour')
-                """, ("Security Room Closet",)).fetchall()
+                    WHERE origin = %s AND (category = 'clue' OR category = 'flavour')
+                """, ("Security Room Closet",))
+                raw_evidence = cur.fetchall()
+                cur.close()
 
             important = [e for e in raw_evidence if e["category"] != "flavour"]
             flavour = [e for e in raw_evidence if e["category"] == "flavour"]
@@ -620,15 +665,18 @@ def security_closet():
             session.modified = True
         else:
             with get_db_connection() as conn:
+                cur = conn.cursor()
                 mixed = []
                 for eid in session["closet_evidence_order"]:
-                    row = conn.execute("""
+                    cur.execute("""
                         SELECT id, name, label, category, description
                         FROM evidence
-                        WHERE id = ?
-                    """, (eid,)).fetchone()
+                        WHERE id = %s
+                    """, (eid,))
+                    row = cur.fetchone()
                     if row:
                         mixed.append(row)
+                cur.close()
         evidence_list = mixed
 
 
@@ -637,7 +685,13 @@ def security_closet():
         if "object" in request.form:
             evidence_name = request.form["object"]
             with get_db_connection() as conn:
-                evidence = conn.execute("SELECT id, name, category, description FROM evidence WHERE name = ?", (evidence_name,)).fetchone()
+                cur = conn.cursor()
+                cur.execute(
+                    "SELECT id, name, category, description FROM evidence WHERE name = %s",
+                    (evidence_name,)
+                )
+                evidence = cur.fetchone()
+                cur.close()
 
             if evidence:
                 if evidence["category"] == "flavour":
@@ -698,7 +752,10 @@ def accuse():
         return render_template("accuse_closed.html")
 
     with get_db_connection() as conn:
-        suspects = conn.execute("SELECT * FROM suspects").fetchall()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM suspects")
+        suspects = cur.fetchall()
+        cur.close()
 
     if request.method == "POST":
         accused_name = request.form.get("accused")
@@ -787,9 +844,10 @@ def verdict():
 
     # Get guilty suspect from DB
     with get_db_connection() as conn:
-        guilty_row = conn.execute(
-            "SELECT name FROM suspects WHERE is_guilty = 1"
-        ).fetchone()
+        cur = conn.cursor()
+        cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE")
+        guilty_row = cur.fetchone()
+        cur.close()
 
     guilty_name = guilty_row["name"] if guilty_row else None
 
@@ -826,9 +884,10 @@ def archives():
 
     # Get guilty suspect from DB
     with get_db_connection() as conn:
-        guilty_row = conn.execute(
-            "SELECT name FROM suspects WHERE is_guilty = 1"
-        ).fetchone()
+        cur = conn.cursor()
+        cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE")
+        guilty_row = cur.fetchone()
+        cur.close()
 
     guilty_name = guilty_row["name"] if guilty_row else None
 
@@ -840,18 +899,20 @@ def archives():
     # Log playthrough (only once per session)
     if "playthrough_id" not in session:
         with get_db_connection() as conn:
-            cur = conn.execute("""
+            cur = conn.cursor()
+            cur.execute("""
                 INSERT INTO playthroughs (timestamp, player_name, accused_name, was_correct, duration_minutes)
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s) RETURNING id;
             """, (
                 end_time.isoformat(),
                 player_name,
                 accused,
-                int(win),
+                win,
                 duration_minutes
             ))
-            session["playthrough_id"] = cur.lastrowid # "lastrowid" returns the last successful INSERT
-            session.modified = True # Force session to save before POST (name insertion if any provided)
+            session["playthrough_id"] = cur.fetchone()["id"]
+            session.modified = True
+            cur.close()
 
     # Clean up session
     session["endgame_reached"] = True
@@ -874,11 +935,13 @@ def submit_name():
     submitted_name = request.form.get("player_name", "").strip()
     if submitted_name and "playthrough_id" in session:
         with get_db_connection() as conn:
-            conn.execute("""
+            cur = conn.cursor()
+            cur.execute("""
                 UPDATE playthroughs
-                SET player_name = ?
-                WHERE id = ?
+                SET player_name = %s
+                WHERE id = %s
             """, (submitted_name, session["playthrough_id"]))
+            cur.close()
         session["player_name"] = submitted_name
         session["logs_signed"] = True
         session.modified = True
@@ -932,7 +995,7 @@ def credits():
             "front_img": "img/suspects/banana.webp",
             "back_img": "img/credits/banana-real.webp",
             "pos_front": "40% 67%",
-            "pos_back": "center"
+            "pos_back": "40% 25%",
         },
         {
             "name": "DS Spoony",
@@ -953,6 +1016,16 @@ def credits():
     return render_template("credits.html", cast=cast)
 
 
+# Helps locate favicon in other folders (and removes the annoying 404...)
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static', 'img', 'ui'),
+        'favicon.png',
+        mimetype='image/png'
+    )
+
+
 # Internal only
 @app.route("/analytics")
 def analytics():
@@ -963,9 +1036,10 @@ def analytics():
         return authenticate()
 
     with get_db_connection() as conn:
-        playthroughs = conn.execute("""
-            SELECT * FROM playthroughs ORDER BY timestamp DESC
-        """).fetchall()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM playthroughs ORDER BY timestamp DESC")
+        playthroughs = cur.fetchall()
+        cur.close()
 
         total = len(playthroughs)
 
@@ -976,7 +1050,7 @@ def analytics():
         for row in playthroughs:
 
             # If the "was_correct" column is 1 (i.e. correct)
-            if row["was_correct"] == 1:
+            if row["was_correct"]:
                 correct += 1
 
         # Make an empty list to hold all durations
