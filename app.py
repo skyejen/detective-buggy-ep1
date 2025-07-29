@@ -1,3 +1,7 @@
+# FOR CS50 STAFF
+# Parts of this project were influenced or assisted by AI (ChatGPT), particularly for Flask routing logic,
+# debugging help, and structural guidance. All final implementation, logic, and design decisions are my own.
+
 from flask import Flask, render_template, request, redirect, session, flash, url_for, Response, send_from_directory
 from flask_session import Session
 import random

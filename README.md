@@ -61,6 +61,9 @@ This project also features a private `/analytics` dashboard (protected by HTTP B
 
 This was not required for CS50x but was added as a personal learning extension (and because I'm nosey).
 
+## 🤖 AI Assistance
+Parts of this project were influenced or assisted by AI (ChatGPT), particularly for Flask routing logic, debugging help, and code structure advice — as well as for all artwork. I also used it extensively during the migration from SQLite to PostgreSQL. Final implementation, logic, and design decisions are my own.
+
 </details>
 
 ## 🚀 Features
