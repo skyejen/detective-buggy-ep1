@@ -2,11 +2,11 @@
 
 Detective Inspector Buggy returns to the station... only to find his precious chicken treats have gone missing. Who’s behind the snack sabotage?
 
-This is a lighthearted mystery game built as part of my CS50x final project (see the [CS50x Assignment Submission Info](#cs50x-assignment-submission-info) section below)
+This is a lighthearted mystery game built as part of my CS50x final project (see the [CS50x Assignment Submission Info](#-cs50x-assignment-submission-info) section below)
 
 It was also my first deployed Flask project, and it taught me a ton: managing scope, balancing logic with storytelling, handling real user input, creating routes and endpoints, and passing information between backend and frontend. I got much more comfortable with Git and GitHub, learned how to deploy with Render, and worked with databases — starting with SQLite and later migrating to PostgreSQL
 
-There’s definitely room for improvement (session handling, conditional logic in Jinja, some DB queries could be cleaner and more — see the [Potential Improvements](#potential-improvements) section below), but I’m proud of how much I learned — and deeply grateful for the support I had to finish it. It was terrifying at first, but I did it 🧠✨
+There’s definitely room for improvement (session handling, conditional logic in Jinja, some DB queries could be cleaner and more — see the [Potential Improvements](#%EF%B8%8F-potential-improvements) section below), but I’m proud of how much I learned — and deeply grateful for the support I had to finish it. It was terrifying at first, but I did it 🧠✨
 
 Built using **Python**, **Flask**, **Jinja2**, **Bootstrap**, and **PostgreSQL** — with some (not very serious) paws-on QA 🐶
 
