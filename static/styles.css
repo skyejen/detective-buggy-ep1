@@ -819,3 +819,32 @@ a.new-location-note:visited {
     border-bottom: 1px solid #333; /* Optional: for visual separation on mobile */
   }
 }
+
+
+/* CS50 INFO */
+
+.internal-panel {
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.info-table th {
+  text-align: left;
+  padding: 8px;
+  color: #ffc107;
+  width: 40%;
+}
+
+.info-table td {
+  padding: 8px;
+  color: #f1f1f1;
+  font-weight: 500;
+}

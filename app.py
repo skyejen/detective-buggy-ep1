@@ -1021,6 +1021,13 @@ def favicon():
     )
 
 
+# Internal only - this is required to display in the CS50x submission video
+@app.route("/cs50-info")
+def cs50_info():
+
+    return render_template("cs50-info.html")
+
+
 # Internal only
 @app.route("/analytics")
 def analytics():
