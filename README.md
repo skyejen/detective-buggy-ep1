@@ -1,4 +1,4 @@
-# 🕵️ Detective Buggy: Episode 1 – A Bitter Bite
+# 🕵️ Detective Buggy: Episode 1 (A Bitter Bite)
 
 Detective Inspector Buggy returns to the station... only to find his precious chicken treats have gone missing. Who’s behind the snack sabotage?
 
