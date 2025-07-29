@@ -1,27 +1,87 @@
-# 🕵️ Detective Buggy: Episode 1 (A Bitter Bite)
+# 🕵️ Detective Buggy: A Bitter Bite (Episode 1)
 
 Detective Inspector Buggy returns to the station... only to find his precious chicken treats have gone missing. Who’s behind the snack sabotage?
 
-This is a lighthearted mystery game built as part of my CS50x final project.
+This is a lighthearted mystery game built as part of my CS50x final project (see the [CS50x Assignment Submission Info](#cs50x-assignment-submission-info) section below)
 
-It was also my first deployed Flask project, and it taught me a ton: managing scope, balancing logic with storytelling, handling real user input, creating routes and endpoints, and passing information between backend and frontend. I got much more comfortable with Git and GitHub, learned how to deploy with Render, and worked with databases — starting with SQLite and later migrating to PostgreSQL.
+It was also my first deployed Flask project, and it taught me a ton: managing scope, balancing logic with storytelling, handling real user input, creating routes and endpoints, and passing information between backend and frontend. I got much more comfortable with Git and GitHub, learned how to deploy with Render, and worked with databases — starting with SQLite and later migrating to PostgreSQL
 
-There’s definitely room for improvement (session handling, conditional logic in Jinja, and some DB queries could be cleaner), but I’m proud of how much I learned — and deeply grateful for the support I had to finish it. It was terrifying at first, but I did it. 🧠✨
+There’s definitely room for improvement (session handling, conditional logic in Jinja, some DB queries could be cleaner and more — see the [Potential Improvements](#potential-improvements) section below), but I’m proud of how much I learned — and deeply grateful for the support I had to finish it. It was terrifying at first, but I did it 🧠✨
 
 Built using **Python**, **Flask**, **Jinja2**, **Bootstrap**, and **PostgreSQL** — with some (not very serious) paws-on QA 🐶
 
 🔗 **Live version:** [https://detective-buggy-ep1.onrender.com](https://detective-buggy-ep1.onrender.com)
+<br><sub><em>💡**Note:** This app is hosted on Render’s free tier, so it may take a minute or two to load the first time.</em></sub>
+
+## 🪄 CS50x Assignment Submission Info
+
+<details>
+<summary>👉 Click to expand details</summary>
+
+### 📝 Submission Details
+
+- 👤 **Author Info:** Available at the in-app route [`/cs50-info`](https://detective-buggy-ep1.onrender.com/cs50-info)
+- 🎥 **Video Demo:** [CS50x Final Project Walkthrough](https://youtu.be/pxXjlVCa3zw)
+
+### 🧪 Tech Stack
+
+This project is built with a Flask-based backend and uses server-side rendering to deliver a dynamic, story-driven experience. It relies on session-based logic and a database of clues, suspects, and player decisions.
+
+- **Flask:** Web framework used to manage routes, templates, and sessions
+- **Jinja2:** Templating engine for dynamic HTML rendering
+- **PostgreSQL:** Backend database for storing suspects, dialogue, evidence, and player analytics
+- **Bootstrap 5:** CSS framework used for responsive layout and UI components
+- **Custom CSS:** Themed design built with dark mode, custom fonts, and animation-friendly layout
+- **Render:** Hosting provider used for both app and PostgreSQL deployment, with auto-updates on GitHub pushes
+
+### 📁 Project File Structure
+
+```bash
+.
+├── app.py                     # Main Flask app with all route logic and game state
+├── templates/                 # Jinja2 HTML templates
+│   ├── layout.html            # Shared layout
+│   ├── *.html                 # All views (crime scene, interviews, etc.)
+├── static/                    # Static assets
+│   ├── img/                   # Images (evidence, suspects, UI)
+│   ├── styles.css             # Custom theme & responsive styling
+│   └── js/scripts.js          # JS for pop-ups and interactivity
+├── schema.sql                 # PostgreSQL schema (suspects, evidence, dialogues, etc.)
+├── requirements.txt           # Dependencies list
+├── .env.example               # Environment variable placeholders
+└── README.md                  # Project documentation
+```
+
+## 🔍 Internal Tools
+
+This project also features a private `/analytics` dashboard (protected by HTTP Basic Auth), used to view:
+- Number of total playthroughs
+- Average playtime
+- Percentage of correct accusations
+
+This was not required for CS50x but was added as a personal learning extension (and because I'm nosey).
+
+</details>
 
 ## 🚀 Features
-- 🎤 Interactive suspect interviews
-- 🧠 Clue-based deduction system
-- 🗣️ Adaptive dialogue based on player progress
-- 🗂️ Evidence board & branching logic
+- 🎤 **Interactive suspect interviews** — Each character has a unique personality, backstory, and dialogue path
+- 🧠 **Clue-based deduction system** — Players must unlock, track, and interpret clues to solve the case
+- 🗣️ **Adaptive dialogue & progression** — Interviews and locations evolve based on your investigation choices
+- 🗂️ **Dynamic evidence board** — Clues and records update in real time as you uncover new leads
+- 🕵️‍♀️ **Player-driven investigation** — Accusation options appear dynamically based on your progress and decisions
+- 🎨 **Custom dark-mode UI** — Built with Bootstrap, themed CSS, and playful interactions
+- 🧾 **[Private] in-game analytics** — View player stats, accuracy, and average playtime via a private dashboard
+
+## 🎨 Art & Assets
+
+All character and background illustrations were generated with the help of ChatGPT's image generation tool, based on descriptions of real pets and my doggo's toys.
+
+No external art was used, and all styling/UI was designed specifically for this project.
 
 ## 🖼️ Screenshots
 
 <details>
-<summary>Click to expand screenshots</summary>
+<summary>👉 Click to expand screenshots</summary>
 
 ### Title Screen
 <img src="screenshots/title-screen.png" width="800"/>
