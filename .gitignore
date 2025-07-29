@@ -5,3 +5,9 @@ todos.txt
 braindump.txt
 .DS_Store
 flask_session/
+__pycache__/
+*.pyc
+*.pyo
+_back-ups/
+.vscode/
+*.log
