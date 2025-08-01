@@ -113,7 +113,7 @@ Ensure python-dotenv is installed and a .env file exists for your secret keys (i
 ### ⚠️ Recommended Python Version
 
 **Python 3.10.x is recommended**  
-Some dependencies may not work properly with newer versions (e.g. 3.12+), due to compatibility issues with libraries like Flask or SQLAlchemy.
+Some dependencies may not work properly with newer versions (e.g. 3.12+), due to compatibility issues with Flask sessions.
 
 We recommend using a **virtual environment (`venv`)** to avoid issues across setups.
 
