@@ -115,7 +115,9 @@ Ensure python-dotenv is installed and a .env file exists for your secret keys (i
 **Python 3.10.x is recommended**  
 Some dependencies may not work properly with newer versions (e.g. 3.12+), due to compatibility issues with Flask sessions.
 
-We recommend using a **virtual environment (`venv`)** to avoid issues across setups.
+**Note:** requirements.txt is a minimal dependency list. See requirements-locked.txt for full frozen environment.
+
+We (Buggy and I!) recommend using a **virtual environment (`venv`)** to avoid issues across setups.
 
 <details>
 <summary>Set up a virtual environment</summary>

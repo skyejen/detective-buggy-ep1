@@ -1,5 +1,6 @@
 .env
 venv/
+testenv/
 .flaskenv
 todos.txt
 braindump.txt

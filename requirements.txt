@@ -1,13 +1,5 @@
-blinker==1.9.0
-cachelib==0.13.0
-click==8.2.1
 Flask==3.1.1
 Flask-Session @ git+https://github.com/fengsp/flask-session.git@bc2fe67958bff5e46023c4807b5e75ca350554eb
-itsdangerous==2.2.0
-Jinja2==3.1.6
-MarkupSafe==3.0.2
-msgspec==0.19.0
 python-dotenv==1.1.1
-Werkzeug==3.1.3
 gunicorn
 psycopg2-binary
