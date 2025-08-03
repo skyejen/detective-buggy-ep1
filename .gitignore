@@ -11,4 +11,4 @@ __pycache__/
 *.pyo
 _back-ups/
 .vscode/
-*.log
+db_back_up_*.sql

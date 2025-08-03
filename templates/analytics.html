@@ -7,6 +7,10 @@
   <li><strong>Total:</strong> {{ stats.total }}</li>
   <li><strong>Correct:</strong> {{ stats.correct }} ({{ stats.correct_pct }}%)</li>
   <li><strong>Avg. Duration:</strong> {{ stats.avg_duration }} min</li>
+  <p class="faded-analytics">
+    P.S. The stats do not include test entries with <code>[Jen]</code> & <code>[Olivato]</code> tags
+    (<span id="toggleTestEntries" onclick="toggleTestEntries()" style="cursor: pointer; color: #4da6ff; text-decoration: underline;">Hide Test Entries</span>).
+  </p>
 </ul>
 
 <hr>
@@ -33,5 +37,30 @@
     {% endfor %}
   </tbody>
 </table>
+
+<!-- Script to filter out test playthrough entries -->
+<script>
+  let hideTests = true;
+
+  function toggleTestEntries() {
+    hideTests = !hideTests;
+    const toggle = document.getElementById("toggleTestEntries");
+    const rows = document.querySelectorAll(".analytics-table tbody tr");
+
+    rows.forEach(row => {
+      const playerCell = row.children[1];
+      if (!playerCell) return;
+
+      const name = playerCell.textContent.trim();
+      const isTest = name.startsWith("[Jen]") || name.startsWith("[Olivato]");
+
+      if (isTest) {
+        row.style.display = hideTests ? "none" : "";
+      }
+    });
+
+    toggle.textContent = hideTests ? "Show Test Entries" : "Hide Test Entries";
+  }
+</script>
 
 {% endblock %}

@@ -1166,39 +1166,26 @@ def analytics():
             print(f"🔴 Released connection ID: {id(conn)}")
 
 
-        total = len(playthroughs)
+        # Separate user entries from test entries for stats
+        user_entries = [
+            row for row in playthroughs
+            if row["player_name"] is None
+            or not row["player_name"].startswith("[Jen]")
+            and not row["player_name"].startswith("[Olivato]")
+        ]
 
-        # Start with zero correct guesses
-        correct = 0
+        total = len(user_entries)
 
-        # Go through each playthrough
-        for row in playthroughs:
+        correct = sum(1 for row in user_entries if row["was_correct"])
 
-            # If the "was_correct" column is 1 (i.e. correct)
-            if row["was_correct"]:
-                correct += 1
+        # Durations only from user entries
+        durations = [
+            max(1, row["duration_minutes"] or 0)
+            for row in user_entries
+            if row["duration_minutes"] is not None
+        ]
 
-        # Make an empty list to hold all durations
-        durations = []
-
-        # Go through each playthrough
-        for row in playthroughs:
-
-            # Skip if there's no duration
-            if row["duration_minutes"] is None:
-                continue
-
-            # If duration is 0, round up to 1
-            clean_duration = max(1, row["duration_minutes"] or 0)
-
-            # Add it to the list
-            durations.append(clean_duration)
-
-        # Calculate average (if we have at least one duration)
-        if durations:
-            avg_duration = round(sum(durations) / len(durations), 1)
-        else:
-            avg_duration = 0
+        avg_duration = round(sum(durations) / len(durations), 1) if durations else 0
 
         stats = {
             "total": total,
@@ -1206,6 +1193,7 @@ def analytics():
             "correct_pct": round((correct / total) * 100, 1) if total > 0 else 0,
             "avg_duration": avg_duration
         }
+
 
     return render_template("analytics.html", playthroughs=playthroughs, stats=stats)
 
