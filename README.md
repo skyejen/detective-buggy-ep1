@@ -30,6 +30,7 @@ This project is built with a Flask-based backend and uses server-side rendering 
 - **Flask:** Web framework used to manage routes, templates, and sessions
 - **Jinja2:** Templating engine for dynamic HTML rendering
 - **PostgreSQL:** Backend database for storing suspects, dialogue, evidence, and player analytics
+- **psycopg2 (with pooling):** Direct database access via PostgreSQL driver, using `SimpleConnectionPool` for efficient connection reuse
 - **Bootstrap 5:** CSS framework used for responsive layout and UI components
 - **Custom CSS:** Themed design built with dark mode, custom fonts, and animation-friendly layout
 - **Render:** Hosting provider used for both app and PostgreSQL deployment, with auto-updates on GitHub pushes
@@ -143,15 +144,15 @@ Deployment instructions or render.yaml will be added in a future update.
 A list of potential improvements for future versions:
 
 - ✅ Replace some hardcoded logic with dynamic, database-driven content
-- ➡️ Replace repeated SQL cursor/connection logic with a fetch_all() helper for cleaner and safer DB access
-- 🐣 Still using one DB connection per request; OK for now but may refactor to use pooling
-- 🗃️ Migrate over Supabase (or Railway) for learning & since Render Postgres auto-expires
+- 🛡️ Migrate from psycopg2 to SQLAlchemy for maintainability and async potential
 - 🎨 Add simple animations for visual polish
 - 🎵 Add audio support (ambience, barks, feedback sounds)
 - 👣 Track player decisions for enhanced analytics *(note: analytics is currently private and optional)*
 - 🪄 Fix line-breaks (yes, 8 years in localisation?.. good line-breaks is life!)
 - 🧪 Lacks automated tests — unit testing DB/session logic is a future (fun) goal
 - 💾 [Stretch Goal] Implement user login/save progress system — not required for a small game, but a great learning opportunity!
+
+**Note:** Free-tier Postgres on Render expires every 90 days (next: end of August). May consider upgrading or migrating later.
 
 ## 👤 Credits
 
