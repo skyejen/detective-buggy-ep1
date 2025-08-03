@@ -238,7 +238,7 @@ def crime_scene():
             unlocked_flavour = session.get("unlocked_flavour", [])
             if evidence_id not in unlocked_flavour:
                 unlocked_flavour.append(evidence_id)
-                flash(f"🤷 Nothing to see here: {matching['description']}")
+                flash(f"🤷 Nothing to see here: {matching['description']}", "flavour")
                 session["unlocked_flavour"] = unlocked_flavour
                 session.modified = True
             else:
@@ -784,7 +784,7 @@ def security_closet():
                 if evidence["category"] == "flavour":
                     if evidence["id"] not in session["unlocked_flavour"]:
                         session["unlocked_flavour"].append(evidence["id"])
-                        flash(f"🤷 Nothing to see here: {evidence['description']}")
+                        flash(f"🤷 Nothing to see here: {evidence['description']}", "flavour")
                         session.modified = True
                     else:
                         flash("📎 You’ve already checked that (still useless).")

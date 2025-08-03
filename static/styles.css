@@ -84,6 +84,14 @@ a.my-btn:visited {
   text-align: center;
 }
 
+/* For lighter flavour flashes */
+.flash.flavour {
+  background-color: #fff176;
+  /* color: #444;
+  border: 1px solid #aaa; */
+}
+
+
 /* Tables */
 
 table {
