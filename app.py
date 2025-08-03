@@ -16,6 +16,9 @@ from psycopg2.pool import SimpleConnectionPool # Attempting to introduce pooling
 
 load_dotenv()
 
+# Database debug
+DEBUG_DB = False
+
 # Load DB connection URL
 db_url = os.getenv("DATABASE_URL")
 if not db_url:
@@ -155,7 +158,8 @@ def crime_scene():
     # Create evidence list once, save order in session
     if "crime_scene_evidence_order" not in session:
         conn = get_db_connection()
-        print(f"🟢 Acquired connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🟢 Acquired connection ID: {id(conn)}")
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -167,7 +171,8 @@ def crime_scene():
                 raw_evidence = [dict(row) for row in raw_evidence]
         finally:
             release_db_connection(conn)
-            print(f"🔴 Released connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🔴 Released connection ID: {id(conn)}")
 
         # Later addition of flavour evidence for immersion, this randomises it in the list (once per session)
         important = [e for e in raw_evidence if e["category"] != "flavour"]
@@ -182,7 +187,8 @@ def crime_scene():
     else:
         # Load based on stored order
         conn = get_db_connection()
-        print(f"🟢 Acquired connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🟢 Acquired connection ID: {id(conn)}")
         try:
             with conn.cursor() as cur:
                 mixed = []
@@ -196,7 +202,8 @@ def crime_scene():
                         mixed.append(dict(row))
         finally:
             release_db_connection(conn)
-            print(f"🔴 Released connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🔴 Released connection ID: {id(conn)}")
 
     # Evidence button logic + flash
     if request.method == "POST":
@@ -259,14 +266,16 @@ def crime_scene():
 @app.route("/suspects", methods=["GET", "POST"])
 def show_suspects():
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM suspects")
             suspects = cur.fetchall()
     finally:
         release_db_connection(conn)
-        print(f"🔴 Released connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🔴 Released connection ID: {id(conn)}")
 
 
     final_lock = session.get("final_lock", False)
@@ -326,14 +335,16 @@ def evidence_board():
     maybe_trigger_noodle()
 
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:            
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM evidence")
             all_evidence = [dict(row) for row in cur.fetchall()]
     finally:
             release_db_connection(conn)
-            print(f"🔴 Released connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🔴 Released connection ID: {id(conn)}")
 
 
     unlocked = session.get("unlocked_evidence", [])
@@ -368,7 +379,8 @@ def interview_lobby():
 
     # Get suspects from the database
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM suspects")
@@ -383,7 +395,8 @@ def interview_lobby():
             dialogue_counts = cur.fetchall()
     finally:
         release_db_connection(conn)
-        print(f"🔴 Released connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🔴 Released connection ID: {id(conn)}")
 
 
     # Turn dialogue_counts into a dictionary ({ suspect_id: count})
@@ -472,7 +485,8 @@ def interview_lobby():
 @app.route("/interview-lobby/<int:suspect_id>", methods=["GET", "POST"])
 def interview_suspect(suspect_id):
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM suspects WHERE id = %s", (suspect_id,))
@@ -486,7 +500,8 @@ def interview_suspect(suspect_id):
             evidence_lookup = cur.fetchall()
     finally:
         release_db_connection(conn)
-        print(f"🔴 Released connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🔴 Released connection ID: {id(conn)}")
 
 
     if not suspect:
@@ -683,7 +698,8 @@ def security_closet():
     if show_evidence:
         if "closet_evidence_order" not in session:
             conn = get_db_connection()
-            print(f"🟢 Acquired connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🟢 Acquired connection ID: {id(conn)}")
             try:
                 with conn.cursor() as cur:
                     cur.execute("""
@@ -694,7 +710,8 @@ def security_closet():
                     raw_evidence = cur.fetchall()
             finally:
                 release_db_connection(conn)
-                print(f"🔴 Released connection ID: {id(conn)}")
+                if DEBUG_DB:
+                    print(f"🔴 Released connection ID: {id(conn)}")
 
 
             important = [e for e in raw_evidence if e["category"] != "flavour"]
@@ -708,7 +725,8 @@ def security_closet():
             session.modified = True
         else:
             conn = get_db_connection()
-            print(f"🟢 Acquired connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🟢 Acquired connection ID: {id(conn)}")
             try:
                 with conn.cursor() as cur:
                     mixed = []
@@ -723,7 +741,8 @@ def security_closet():
                             mixed.append(row)
             finally:
                 release_db_connection(conn)
-                print(f"🔴 Released connection ID: {id(conn)}")
+                if DEBUG_DB:
+                    print(f"🔴 Released connection ID: {id(conn)}")
         evidence_list = mixed
 
 
@@ -732,7 +751,8 @@ def security_closet():
         if "object" in request.form:
             evidence_name = request.form["object"]
             conn = get_db_connection()
-            print(f"🟢 Acquired connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🟢 Acquired connection ID: {id(conn)}")
             try:
                 with conn.cursor() as cur:
                     cur.execute(
@@ -742,7 +762,8 @@ def security_closet():
                     evidence = cur.fetchone()
             finally:
                 release_db_connection(conn)
-                print(f"🔴 Released connection ID: {id(conn)}")
+                if DEBUG_DB:
+                    print(f"🔴 Released connection ID: {id(conn)}")
 
 
             if evidence:
@@ -804,14 +825,16 @@ def accuse():
         return render_template("accuse_closed.html")
 
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM suspects")
             suspects = cur.fetchall()
     finally:
         release_db_connection(conn)
-        print(f"🔴 Released connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🔴 Released connection ID: {id(conn)}")
 
 
     if request.method == "POST":
@@ -901,14 +924,16 @@ def verdict():
 
     # Get guilty suspect from DB
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE")
             guilty_row = cur.fetchone()
     finally:
         release_db_connection(conn)
-        print(f"🔴 Released connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🔴 Released connection ID: {id(conn)}")
 
 
     guilty_name = guilty_row["name"] if guilty_row else None
@@ -946,14 +971,16 @@ def archives():
 
     # Get guilty suspect from DB
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE")
             guilty_row = cur.fetchone()
     finally:
         release_db_connection(conn)
-        print(f"🔴 Released connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🔴 Released connection ID: {id(conn)}")
 
 
     guilty_name = guilty_row["name"] if guilty_row else None
@@ -966,7 +993,8 @@ def archives():
     # Log playthrough (only once per session)
     if "playthrough_id" not in session:
         conn = get_db_connection()
-        print(f"🟢 Acquired connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🟢 Acquired connection ID: {id(conn)}")
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -984,7 +1012,8 @@ def archives():
                 session.modified = True
         finally:
             release_db_connection(conn)
-            print(f"🔴 Released connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🔴 Released connection ID: {id(conn)}")
 
 
     # Clean up session
@@ -1008,7 +1037,8 @@ def submit_name():
     submitted_name = request.form.get("player_name", "").strip()
     if submitted_name and "playthrough_id" in session:
         conn = get_db_connection()
-        print(f"🟢 Acquired connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🟢 Acquired connection ID: {id(conn)}")
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -1019,7 +1049,8 @@ def submit_name():
                 conn.commit()
         finally:
             release_db_connection(conn)
-            print(f"🔴 Released connection ID: {id(conn)}")
+            if DEBUG_DB:
+                print(f"🔴 Released connection ID: {id(conn)}")
 
 
         session["player_name"] = submitted_name
@@ -1123,14 +1154,16 @@ def analytics():
         return authenticate()
 
     conn = get_db_connection()
-    print(f"🟢 Acquired connection ID: {id(conn)}")
+    if DEBUG_DB:
+        print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM playthroughs ORDER BY timestamp DESC")
             playthroughs = cur.fetchall()
     finally:
         release_db_connection(conn)
-        print(f"🔴 Released connection ID: {id(conn)}")
+        if DEBUG_DB:
+            print(f"🔴 Released connection ID: {id(conn)}")
 
 
         total = len(playthroughs)
