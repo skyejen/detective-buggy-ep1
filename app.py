@@ -191,15 +191,22 @@ def crime_scene():
             print(f"🟢 Acquired connection ID: {id(conn)}")
         try:
             with conn.cursor() as cur:
-                mixed = []
-                for eid in session["crime_scene_evidence_order"]:
-                    cur.execute(
-                        "SELECT id, name, label, category, description, image_filename FROM evidence WHERE id = %s",
-                        (eid,)
-                    )
-                    row = cur.fetchone()
-                    if row:
-                        mixed.append(dict(row))
+                evidence_ids = session["crime_scene_evidence_order"]
+                format_strings = ','.join(['%s'] * len(evidence_ids))
+
+                cur.execute(
+                    f"""
+                    SELECT id, name, label, category, description, image_filename
+                    FROM evidence
+                    WHERE id IN ({format_strings})
+                    """,
+                    tuple(evidence_ids)
+                )
+
+                fetched = [dict(row) for row in cur.fetchall()]
+                id_to_evidence = {e["id"]: e for e in fetched}
+                mixed = [id_to_evidence[eid] for eid in evidence_ids if eid in id_to_evidence]
+
         finally:
             release_db_connection(conn)
             if DEBUG_DB:
@@ -270,7 +277,10 @@ def show_suspects():
         print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM suspects")
+            cur.execute("""
+                SELECT id, name, species, description, alibi, image_filename
+                FROM suspects
+            """)
             suspects = cur.fetchall()
     finally:
         release_db_connection(conn)
@@ -339,7 +349,11 @@ def evidence_board():
         print(f"🟢 Acquired connection ID: {id(conn)}")
     try:            
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM evidence")
+            cur.execute("""
+                SELECT id, name, label, category, description, image_filename, always_visible
+                FROM evidence
+            """)
+
             all_evidence = [dict(row) for row in cur.fetchall()]
     finally:
             release_db_connection(conn)
@@ -383,7 +397,7 @@ def interview_lobby():
         print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM suspects")
+            cur.execute("SELECT id, name FROM suspects")
             suspects = cur.fetchall()
 
             # Dialogue counts per suspect (so we know when interviews are complete)
@@ -489,10 +503,10 @@ def interview_suspect(suspect_id):
         print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM suspects WHERE id = %s", (suspect_id,))
+            cur.execute("SELECT id, name FROM suspects WHERE id = %s", (suspect_id,))
             suspect = cur.fetchone()
 
-            cur.execute("SELECT * FROM dialogues WHERE suspect_id = %s", (suspect_id,))
+            cur.execute("SELECT line, evidence_id FROM dialogues WHERE suspect_id = %s", (suspect_id,))
             dialogue_lines = cur.fetchall()
 
             # Pre-fetch evidence for fast access
@@ -829,7 +843,7 @@ def accuse():
         print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM suspects")
+            cur.execute("SELECT name, image_filename FROM suspects")
             suspects = cur.fetchall()
     finally:
         release_db_connection(conn)
@@ -928,8 +942,11 @@ def verdict():
         print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE")
+            cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE LIMIT 1")
             guilty_row = cur.fetchone()
+
+            if not guilty_row:
+                print("⚠️ No guilty suspect found in DB! Check is_guilty column.")
     finally:
         release_db_connection(conn)
         if DEBUG_DB:
@@ -975,7 +992,7 @@ def archives():
         print(f"🟢 Acquired connection ID: {id(conn)}")
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE")
+            cur.execute("SELECT name FROM suspects WHERE is_guilty = TRUE LIMIT 1")
             guilty_row = cur.fetchone()
     finally:
         release_db_connection(conn)
