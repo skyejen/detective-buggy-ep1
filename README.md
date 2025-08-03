@@ -90,11 +90,11 @@ No external art was used, and all styling/UI was designed specifically for this 
 ### Title Screen
 <img src="screenshots/title-screen.png" width="800"/>
 
-### Suspect Board
-<img src="screenshots/suspect-board.png" width="800"/>
-
 ### Briefing Screen
 <img src="screenshots/briefing-screen.png" width="800"/>
+
+### Suspect Board
+<img src="screenshots/suspect-board.png" width="800"/>
 
 </details>
 
